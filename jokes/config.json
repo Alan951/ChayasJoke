@@ -1,0 +1,8 @@
+{
+  "Jokes": [
+	{
+	  "fileName": "SaludoJoke.jar",
+	  "className": "saludojoke.MyJoke"
+	}
+  ]
+}
