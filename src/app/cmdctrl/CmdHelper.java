@@ -22,7 +22,7 @@ public class CmdHelper {
 		chooseIdClient.setRequired(false);
 		options.addOption(chooseIdClient);
 		
-		Option paramsJoke = new Option("p", "params", true, "Params of Joke");
+		Option paramsJoke = new Option("p", "params", true, "Params of Joke in format \"paramName=valueOfParam\". Joke is required");
 		paramsJoke.setRequired(false);
 		paramsJoke.setValueSeparator('=');
 		paramsJoke.setArgs(Option.UNLIMITED_VALUES);

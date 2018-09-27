@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 
 import app.GlobalOpts;
 import app.config.Verbosity;
@@ -27,6 +28,10 @@ public class BasicFunc {
 		
 		String mainCommand = cmd.getOptions()[0].getLongOpt();
 		
+		if(GlobalOpts.verboseLevel == Verbosity.VERBOSE_DEBUG) {
+			System.out.println("[*] Main Command: " + mainCommand);
+		}
+		
 		switch(mainCommand) {
 			case "joke":
 				this.result = executeJoke(cmd);
@@ -39,6 +44,9 @@ public class BasicFunc {
 				break;
 			case "client-list":
 				this.result = showClientList();
+				break;
+			case "help":
+				this.result = showHelp();
 				break;
 		}
 		
@@ -93,7 +101,12 @@ public class BasicFunc {
 		return 0;
 	}
 
-	
+	public int showHelp() {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("ChayasJoke", CmdHelper.getOptions());
+		
+		return 1;
+	}
 	
 	public int showJokeList() {
 		System.out.println(JokeLoader.getInstance().getJokeListNames());

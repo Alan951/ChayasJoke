@@ -37,7 +37,8 @@ public class CmdServ {
 			if((checkResult = checkCommand(command)) == null){
 				
 				basicFunc.routeCommand(command).then((result) -> {
-					System.out.println("[R]: "+result);
+					if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
+						System.out.println("[*] Result of route command: "+result);
 				});
 				
 			}else {
