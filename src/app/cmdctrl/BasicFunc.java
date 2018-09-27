@@ -18,14 +18,18 @@ public class BasicFunc {
 	private ServerSockService serverService;
 	
 	protected Integer result;
+	protected CommandLine cmd;
 	
 	public BasicFunc(ServerSockService serverService) {
 		this.serverService = serverService;
 	}
+	
+	public BasicFunc routeCommand(String command, CommandLine cmd) {		
+		return setCommandLine(cmd)
+				.routeCommand(command);
+	}
 
-	public BasicFunc routeCommand(String command) {
-		CommandLine cmd = CmdHelper.parseCommand(command);
-		
+	public BasicFunc routeCommand(String command) {		
 		String mainCommand = cmd.getOptions()[0].getLongOpt();
 		
 		if(GlobalOpts.verboseLevel == Verbosity.VERBOSE_DEBUG) {
@@ -151,6 +155,12 @@ public class BasicFunc {
 		callback.run(result);
 		
 		this.result = 0;
+		
+		return this;
+	}
+	
+	public BasicFunc setCommandLine(CommandLine cmd) {
+		this.cmd = cmd;
 		
 		return this;
 	}

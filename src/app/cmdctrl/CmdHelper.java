@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -54,7 +55,7 @@ public class CmdHelper {
 		return false;
 	}
 	
-	public static CommandLine parseCommand(String command) {
+	public static CheckCmdResult parseCommand(String command) throws MissingArgumentException {
 		CommandLine cmd;
 		CommandLineParser parser = new DefaultParser();
 		
@@ -85,11 +86,13 @@ public class CmdHelper {
 			
 			cmd = parser.parse(CmdHelper.getOptions(), cmds2.stream().toArray(String[]::new));
 			
+		}catch(MissingArgumentException e) {
+			throw e;
 		}catch(ParseException e) {
 			//e.printStackTrace();
 			return null;
 		}
 		
-		return cmd;
+		return new CheckCmdResult(command, cmd, "ok", true);
 	}
 }

@@ -3,6 +3,7 @@ package app.cmdctrl;
 import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.MissingArgumentException;
 
 import app.GlobalOpts;
 import app.config.Verbosity;
@@ -32,17 +33,15 @@ public class CmdServ {
 				break;
 			}
 			
-			String checkResult = null;
+			CheckCmdResult cmd = checkCommand(command);
 			
-			if((checkResult = checkCommand(command)) == null){
-				
-				basicFunc.routeCommand(command).then((result) -> {
+			if(cmd.isValid) {
+				basicFunc.routeCommand(command, cmd.cmdLine).then((result) -> {
 					if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
 						System.out.println("[*] Result of route command: "+result);
 				});
-				
 			}else {
-				System.out.println("[*] Error: "+checkResult);
+				System.out.println("[!] Error\n"+cmd.result);
 			}
 		}
 		
@@ -51,24 +50,24 @@ public class CmdServ {
 	
 	
 	
-	public String checkCommand(String command) {
+	public CheckCmdResult checkCommand(String command) {
 		if(command.trim().isEmpty()) {
-			return "Comando no valido";
+			return new CheckCmdResult(command, "[!] Comando no valido", false);
 		}
 		
-		CommandLine cmd = CmdHelper.parseCommand(command);
+		CheckCmdResult result;
 		
-		if(cmd == null) {
-			return "[!] Comando no valido";
+		try {
+			result = CmdHelper.parseCommand(command);
+		}catch(MissingArgumentException e) {
+			return new CheckCmdResult(command, "[!] Se esperaban argumentos para el comando", false); 
 		}
 		
-		//verify joke exists
-		/*if(CmdHelper.existsOption("joke", cmd.getOptions()) && !JokeFactory.exists(cmd.getOptionValue("joke"))) { // don't exists
-			
-			return "No existe \"joke\" seleccionado";
-		}*/
+		if(result == null) {
+			return new CheckCmdResult(command, "[!] Comando no valido", false);
+		}
 		
-		return null;
+		return result;
 	}
 	
 }
