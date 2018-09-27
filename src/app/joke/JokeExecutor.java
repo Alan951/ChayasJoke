@@ -12,7 +12,7 @@ public class JokeExecutor {
 	private SockService sockService;
 	
 	public static final int JOKE_EXECUTED = 1;
-	public static final int JOKE_ERROR = 0; //TODO: implement catching error when try execute
+	public static final int JOKE_ERROR = 0; //TODO: implement catching error when attempting execute
 	public static final int JOKE_NOT_FOUND = -1;
 	
 	private List<JokeThreadWrapper> executingJokes;

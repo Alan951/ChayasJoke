@@ -2,7 +2,6 @@ package app.cmdctrl;
 
 import java.util.Scanner;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.MissingArgumentException;
 
 import app.GlobalOpts;
@@ -38,7 +37,7 @@ public class CmdServ {
 			if(cmd.isValid) {
 				basicFunc.routeCommand(command, cmd.cmdLine).then((result) -> {
 					if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
-						System.out.println("[*] Result of route command: "+result);
+						System.out.println("[*] Result of command routed: "+result);
 				});
 			}else {
 				System.out.println("[!] Error\n"+cmd.result);
@@ -47,8 +46,6 @@ public class CmdServ {
 		
 		sc.close();
 	}
-	
-	
 	
 	public CheckCmdResult checkCommand(String command) {
 		if(command.trim().isEmpty()) {
