@@ -12,6 +12,38 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CmdHelper {
+	public static Options startOptions() {
+		Options options = new Options();
+		
+		Option hostClientMode = new Option("s", "server", false, "Server Mode");
+		Option ipAddrToConnect = new Option("ip", "ip", true, "IP Address of Server. Default: \"127.0.0.1\"");
+		ipAddrToConnect.setType(String.class);
+		
+		Option port = new Option("p", "port", true, "Port to connect or to binding server. Default: \"951\"");
+		port.setType(Integer.class);
+		
+		Option connectAttempt = new Option("ca", "connectionAttempt", false, "Enable connection attempts to server. Default: \"false\"");
+		
+		Option attemptConnectTimes = new Option("t", "connectionAttempts", true, "Set the number of attempts to connect. The default value is: 0 (infinite) but if the connection attempt is false, only connect once.");
+		attemptConnectTimes.setType(Integer.class);
+		
+		Option autoConnect = new Option("ac", "autoConn", true, "Enable auto-connection. When close connection, auto-connection try connecting again. Use -ca with -ac to create a daemon which forever try connect to joke-server.");
+		
+		
+		Option hostServerMode = new Option("c", "client", false, "Victim Mode");
+		
+		
+		options.addOption(hostClientMode);
+		options.addOption(ipAddrToConnect);
+		options.addOption(port);
+		options.addOption(connectAttempt);
+		options.addOption(attemptConnectTimes);
+		options.addOption(autoConnect);
+		options.addOption(hostServerMode);
+		
+		return options;
+	}
+	
 	public static Options getOptions() {		
 		Options options = new Options();
 		
@@ -55,7 +87,7 @@ public class CmdHelper {
 		return false;
 	}
 	
-	public static CheckCmdResult parseCommand(String command) throws MissingArgumentException {
+	public static CheckCmdResult parseCommand(String command, Options options) throws MissingArgumentException {
 		CommandLine cmd;
 		CommandLineParser parser = new DefaultParser();
 		
@@ -84,7 +116,7 @@ public class CmdHelper {
 			if(!tempCmd.equals(""))
 				throw new ParseException("Falta cierre de comillas");
 			
-			cmd = parser.parse(CmdHelper.getOptions(), cmds2.stream().toArray(String[]::new));
+			cmd = parser.parse(options, cmds2.stream().toArray(String[]::new));
 			
 		}catch(MissingArgumentException e) {
 			throw e;
@@ -94,5 +126,24 @@ public class CmdHelper {
 		}
 		
 		return new CheckCmdResult(command, cmd, "ok", true);
+	}
+	
+	public static CheckCmdResult parseCommand(String args[], Options options) throws MissingArgumentException {
+		CommandLine cmd;
+		CommandLineParser parser = new DefaultParser();
+		
+		try {
+			
+			
+			cmd = parser.parse(options, args);
+			
+		}catch(MissingArgumentException e) {
+			throw e;
+		}catch(ParseException e) {
+			//e.printStackTrace();
+			return null;
+		}
+		
+		return new CheckCmdResult(null, cmd, "ok", true);
 	}
 }

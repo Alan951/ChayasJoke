@@ -14,9 +14,11 @@ public class ServerSockService {
 	
 	private boolean flagInComConn;
 	
-	public ServerSockService() {
+	private SockConfig sockConfig;
+	
+	public ServerSockService(SockConfig sockConfig) {
 		clientSocks = new ArrayList<SockService>();
-		
+		this.sockConfig = sockConfig;
 	}
 	
 	public List<SockService> getClients() {
@@ -24,11 +26,11 @@ public class ServerSockService {
 	}
 	
 	public boolean startInComingConnections() {
-		System.out.println("[*] Server startInComingConnections");
+		System.out.println("[*] Server startInComingConnections over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
 		
 		try {
 			this.flagInComConn = true;
-			serverSock = new ServerSocket(4465);
+			serverSock = new ServerSocket(this.sockConfig.getPort());
 			
 			new Thread(() -> {
 				long idAI = 0;

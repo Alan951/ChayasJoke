@@ -1,18 +1,22 @@
 package app.socket;
 
-public class Config {
+public class SockConfig {
 	public String address;
 	public int port;
 	public boolean attemptConnect;
 	public int attempt_times;
 	public boolean autoConnect;
 
-	public Config(String address, int port) {
+	public SockConfig(int port) {
+		this.port = port;
+	}
+	
+	public SockConfig(String address, int port) {
 		this.address = address;
 		this.port = port;
 	}
 	
-	public Config(String address, int port, boolean attemptConnect, int attempt_times, boolean autoConnect) {
+	public SockConfig(String address, int port, boolean attemptConnect, int attempt_times, boolean autoConnect) {
 		this.address = address;
 		this.port = port;
 		this.attemptConnect = attemptConnect;
@@ -24,7 +28,7 @@ public class Config {
 		return address;
 	}
 	
-	public Config setAddress(String address) {
+	public SockConfig setAddress(String address) {
 		this.address = address;
 		
 		return this;
@@ -34,7 +38,7 @@ public class Config {
 		return port;
 	}
 	
-	public Config setPort(int port) {
+	public SockConfig setPort(int port) {
 		this.port = port;
 		
 		return this;
@@ -44,7 +48,7 @@ public class Config {
 		return attemptConnect;
 	}
 	
-	public Config setAttemptConnect(boolean attemptConnect) {
+	public SockConfig setAttemptConnect(boolean attemptConnect) {
 		this.attemptConnect = attemptConnect;
 		
 		return this;
@@ -54,7 +58,7 @@ public class Config {
 		return attempt_times;
 	}
 	
-	public Config setAttemptTimes(int attempt_times) {
+	public SockConfig setAttemptTimes(int attempt_times) {
 		this.attempt_times = attempt_times;
 		
 		return this;

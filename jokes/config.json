@@ -1,8 +1,8 @@
 {
-  "Jokes": [
-	{
-	  "fileName": "SaludoJoke.jar",
-	  "className": "saludojoke.MyJoke"
-	}
-  ]
+	"Jokes": [
+		{
+			"fileName": "SaludoJoke.jar",
+			"className": "saludojoke.MyJoke"
+		}
+	]
 }

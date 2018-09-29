@@ -3,6 +3,8 @@ package app.socket;
 import java.io.IOException;
 import java.net.Socket;
 
+import app.GlobalOpts;
+import app.config.Verbosity;
 import rx.subjects.PublishSubject;
 
 public class SockService {
@@ -12,7 +14,7 @@ public class SockService {
 	
 	private Socket socket;
 	private IOSocket ioSocket;
-	private Config conf;
+	private SockConfig conf;
 	
 	private long id;
 	
@@ -21,14 +23,17 @@ public class SockService {
 	
 	public SockService() {
 		//Default configuration Socket
-		this.conf = new Config("localhost", 4465);
+		//this.conf = new SockConfig("localhost", 4465);
 	}
 	
 	public void connect() throws IOException {
+		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
+			System.out.println("[!] Attempting connect to "+this.conf.address+":"+this.conf.port);
+		}
 		this.connect(this.conf);
 	}
 	
-	public void connect(Config conf) throws IOException{
+	public void connect(SockConfig conf) throws IOException{
 		this.setConfig(conf);
 		
 		if(conf.getAttemptTimes() != 0) {
@@ -64,6 +69,7 @@ public class SockService {
 		try {
 			this.socket = new Socket(this.conf.getAddress(), this.conf.getPort());
 		}catch(IOException e) {
+			//e.printStackTrace();
 			return false;
 		}
 		
@@ -100,7 +106,7 @@ public class SockService {
 			
 			this.onDisconnected();
 		}catch(IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			
 			return false;
 		}
@@ -108,7 +114,7 @@ public class SockService {
 		return true;
 	}
 	
-	public SockService setConfig(Config conf) {
+	public SockService setConfig(SockConfig conf) {
 		this.conf = conf;
 		
 		return this;

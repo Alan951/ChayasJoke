@@ -1,5 +1,9 @@
 package app.cmdctrl;
 
+/*
+ * Comandos que pueden ser enviados a la computadora victima
+ * 
+ * */
 public enum Commands {
 	ECHO, HOSTNAME, JOKE_RUNNING, JOKE_STOP;
 	

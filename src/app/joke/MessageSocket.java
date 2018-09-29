@@ -110,7 +110,7 @@ public class MessageSocket implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MessageSocket [code=" + code + ", action=" + action + ", jokeName=" + jokeName + ", jokeParams="
-				+ jokeParams + "]";
+		return "MessageSocket [code=" + code + ", action=" + action + ", command=" + command + ", param=" + param
+				+ ", jokeName=" + jokeName + ", jokeParams=" + jokeParams + "]";
 	}
 }
