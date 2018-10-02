@@ -1,6 +1,7 @@
 package app.socket;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class ServerSockService {
 		return this.clientSocks;
 	}
 	
-	public boolean startInComingConnections() {
+	public boolean startInComingConnections() throws BindException{
 		System.out.println("[*] Server startInComingConnections over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
 		
 		try {
@@ -66,6 +67,8 @@ public class ServerSockService {
 					}
 				}
 			}).start();
+		}catch(BindException e) {
+			throw e;
 		}catch(IOException e) {
 			e.printStackTrace();
 			

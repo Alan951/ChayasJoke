@@ -24,13 +24,13 @@ public class CmdHelper {
 		
 		Option connectAttempt = new Option("ca", "connectionAttempt", false, "Enable connection attempts to server. Default: \"false\"");
 		
-		Option attemptConnectTimes = new Option("t", "connectionAttempts", true, "Set the number of attempts to connect. The default value is: 0 (infinite) but if the connection attempt is false, only connect once.");
+		Option attemptConnectTimes = new Option("t", "numAttempts", true, "Set the number of attempts to connect. The default value is: -1 (infinite) but if the connection attempt is false, only connect once.");
 		attemptConnectTimes.setType(Integer.class);
 		
-		Option autoConnect = new Option("ac", "autoConn", true, "Enable auto-connection. When close connection, auto-connection try connecting again. Use -ca with -ac to create a daemon which forever try connect to joke-server.");
-		
+		Option autoConnect = new Option("ac", "autoConn", false, "Enable auto-connection. When close connection, auto-connection try connecting again. Use -ca with -ac to create a daemon which forever try connect to joke-server.");	
 		
 		Option hostServerMode = new Option("c", "client", false, "Victim Mode");
+		Option help = new Option("h", "help", false, "This message");
 		
 		
 		options.addOption(hostClientMode);
@@ -40,6 +40,7 @@ public class CmdHelper {
 		options.addOption(attemptConnectTimes);
 		options.addOption(autoConnect);
 		options.addOption(hostServerMode);
+		options.addOption(help);
 		
 		return options;
 	}

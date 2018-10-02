@@ -3,6 +3,7 @@ package app.socket;
 import java.io.IOException;
 import java.net.Socket;
 
+import app.App;
 import app.GlobalOpts;
 import app.config.Verbosity;
 import rx.subjects.PublishSubject;
@@ -21,10 +22,7 @@ public class SockService {
 	private PublishSubject<Object> observerMessages;
 	private PublishSubject<ConnectionStatus> observerConnection = PublishSubject.create();
 	
-	public SockService() {
-		//Default configuration Socket
-		//this.conf = new SockConfig("localhost", 4465);
-	}
+	public SockService() {}
 	
 	public void connect() throws IOException {
 		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
@@ -36,33 +34,40 @@ public class SockService {
 	public void connect(SockConfig conf) throws IOException{
 		this.setConfig(conf);
 		
-		if(conf.getAttemptTimes() != 0) {
-			new Thread(() -> {
-				try {
-					int attempts = 0;
+		new Thread(() -> {
+			try {
+				int attempts = 0;
+				
+				while((attempts <= conf.attempt_times - 1) || conf.attempt_times == -1) {
+					System.out.println("[*] ATTEMPTING CONNECT");
+					this.observerConnection.onNext(new ConnectionStatus("ATTEMPT_CONNECT_STATUS", this));
 					
-					while(attempts < conf.attempt_times) {
-						System.out.println("[*] ATTEMPTING CONNECT");
-						this.observerConnection.onNext(new ConnectionStatus("ATTEMPT_CONNECT_STATUS", this));
+					if(this.connectSocket()) {
+						break;
+					}else {
+						//Incremento el intento si son finitos
+						if(conf.attempt_times != -1)
+							attempts++;
 						
-						if(this.connectSocket()) {
-							break;
+						if(conf.attempt_times == -1 || attempts <= conf.attempt_times - 1) {	
+							Thread.sleep(1000 * 3);
+							
+							
+						}else {
+							if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL) {
+								System.out.println("[!] Can't connect to server");
+								App.exit();
+							}
+							
 						}
-						
-						Thread.sleep(1000 * 10);
 					}
-					
-				}catch(InterruptedException e) {
-					e.printStackTrace();
-				}catch(IOException e) {
-					e.printStackTrace();
 				}
-			}).start();
-		}else {
-			System.out.println("[*] ATTEMPTING CONNECT");
-			this.observerConnection.onNext(new ConnectionStatus("ATTEMPT_CONNECT_STATUS", this));
-			connectSocket();
-		}
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 	
 	private boolean connectSocket() throws IOException {
@@ -94,6 +99,8 @@ public class SockService {
 		
 		if(this.conf.isAutoConnect()) {
 			this.connect();
+		}else {
+			App.exit();
 		}
 	}
 	

@@ -1,13 +1,13 @@
 package app;
 
 import java.io.IOException;
+import java.net.BindException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 
-import app.cmdctrl.BasicFunc;
-import app.cmdctrl.BasicFuncResult;
+
 import app.cmdctrl.CheckCmdResult;
 import app.cmdctrl.CmdClient;
 import app.cmdctrl.CmdHelper;
@@ -32,17 +32,23 @@ public class App {
 		}*/
 		
 		//String mode = args[0];
+		try {
+			new App()
+				.bootstrap()
+					.initConfig(args)
+						.run();
+		}catch(BindException e) {
+			System.out.println("[!] Error. Puerto en uso.");
+		}
 		
-		new App()
-			.bootstrap()
-				.initConfig(args)
-					.run();
 	}
 	
+	/*
+	 * TODO: validate input data.
+	 * 
+	 * */
 	public App initConfig(String[] args) {
 		try {
-			
-			
 			CheckCmdResult ccr = CmdHelper.parseCommand(args, CmdHelper.startOptions());
 			
 			CommandLine cli = ccr.cmdLine;
@@ -59,6 +65,23 @@ public class App {
 				this.runMode = 1;
 				this.sockConfig = DefaultConfigure.getautoSockConfigClient();
 				
+				if(cli.hasOption("port")) {
+					sockConfig.setPort(Integer.parseInt(cli.getOptionValue("port")));
+				}
+				
+				if(cli.hasOption("connectionAttempt")) {
+					sockConfig.setAttemptConnect(true);
+				}
+				
+				if(cli.hasOption("autoConn")) {
+					sockConfig.setAutoConnect(true);
+				}else {
+					sockConfig.setAutoConnect(false);
+				}
+				
+				if(cli.hasOption("numAttempts")) {
+					sockConfig.setAttemptTimes(Integer.parseInt(cli.getOptionValue("numAttempts")));
+				}
 			}else {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("ChayasJoke", CmdHelper.startOptions());
@@ -106,7 +129,7 @@ public class App {
 		socket.connect();
 	}
 	
-	public void runServerMode(SockConfig config) {
+	public void runServerMode(SockConfig config) throws BindException{
 		System.out.println("[*] Server mode running");
 		
 		ServerSockService server = new ServerSockService(config);
@@ -115,5 +138,9 @@ public class App {
 		cmdAndControl = new CmdServ(server);
 		cmdAndControl.openCmd();
 		
+	}
+	
+	public static void exit() {
+		System.out.println("[!] Bye...");
 	}
 }

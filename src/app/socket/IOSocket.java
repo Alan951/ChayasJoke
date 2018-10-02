@@ -45,8 +45,10 @@ public class IOSocket {
 		
 		this.oisThread = new Thread(() -> {
 			this.flagOis = true;
+			
 			if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
 				System.out.println("[*] initOIS invoked - thread started");
+			
 			Object inMessage = "";
 			
 			while(this.flagOis) { //While thread is up
@@ -59,7 +61,7 @@ public class IOSocket {
 				}catch(ClassNotFoundException e) {
 					e.printStackTrace();
 				}catch(IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					
 					this.flagOis = false;
 					
@@ -79,7 +81,8 @@ public class IOSocket {
 	}
 	
 	public void sendData(Object data) throws IOException {
-		System.out.println("[*] IOSocket sendData invoked: "+ data);
+		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
+			System.out.println("[*] IOSocket sendData invoked: "+ data);
 		this.oos.writeObject(data);
 	}
 	
