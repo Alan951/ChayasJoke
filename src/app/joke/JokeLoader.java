@@ -91,6 +91,10 @@ public class JokeLoader {
 			if(jokeFile.isFile()) {
 				Pair<String, Constructor<? extends JokeBase>> jokePair = loadJoke(jokeFile, "jokes."+jokeFile.getName().replaceFirst("[.][^.]+$", ""));
 				
+				if(jokePair == null) { //Error al intentar castear
+					continue;
+				}
+				
 				if(jokePair.getValue() == null) {
 					System.out.println("[!] Joke file \""+ jokeFile.getName() +"\".");
 					continue;
@@ -242,7 +246,7 @@ public class JokeLoader {
 			
 			return new Pair<String, Constructor<? extends JokeBase>>(constructor.newInstance().command(), constructor);
 		}catch(Exception e) {
-			e.printStackTrace();
+			System.out.println("[ERR] Error al intentar cargar " + file.getName() + ": " + e.getMessage());
 		}
 		
 		return null;

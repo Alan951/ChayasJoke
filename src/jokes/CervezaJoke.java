@@ -29,10 +29,10 @@ public class CervezaJoke extends JokeBase implements Joke {
 		}catch(IOException e) {
 			e.printStackTrace();
 			
-			return "ERROR ON OPEN";
+			return "Error al abrir. Mesaje de error: " + e.getMessage();
 		}
 		
-		return "OPENED!";
+		return "Ventana abierta!";
 		
 	}
 
@@ -48,8 +48,10 @@ public class CervezaJoke extends JokeBase implements Joke {
 
 	@Override
 	public String help() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Esta broma ejecuta nircmdc.exe para aumentar el volumen de la computadora victima\n"
+				+ "y ejecuta chrome con el path \"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\"\n"
+				+ "enviando por parametro la siguiente url: \"https://youtu.be/DuoCd7UEkpc?t=33\"\n"
+				+ "el cual es la dirección del video de \"Cerveza Cerveza de Wendy Sulca\"";
 	}
 
 	@Override
