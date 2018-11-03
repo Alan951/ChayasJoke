@@ -82,6 +82,7 @@ public class ServerSockService {
 		this.clientSocks.forEach((client) -> {
 			try {
 				client.close();
+				flagInComConn = false;
 			}catch(IOException e) {
 				e.printStackTrace();
 			}

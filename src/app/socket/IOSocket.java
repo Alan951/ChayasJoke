@@ -88,6 +88,7 @@ public class IOSocket {
 	
 	public void stop() throws IOException {
 		this.flagOis = false;
+		this.oisThread.interrupt();
 		
 		this.closeOIS();
 		this.closeOOS();
