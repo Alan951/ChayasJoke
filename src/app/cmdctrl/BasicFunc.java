@@ -29,7 +29,9 @@ public class BasicFunc {
 				.routeCommand(command);
 	}
 
-	public BasicFunc routeCommand(String command) {		
+	public BasicFunc routeCommand(String command) {
+		
+		
 		String mainCommand = cmd.getOptions()[0].getLongOpt();
 		
 		if(GlobalOpts.verboseLevel == Verbosity.VERBOSE_DEBUG) {

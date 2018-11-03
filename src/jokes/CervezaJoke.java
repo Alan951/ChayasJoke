@@ -24,7 +24,6 @@ public class CervezaJoke extends JokeBase implements Joke {
 	@Override
 	public String run() {
 		try {
-			Runtime.getRuntime().exec("./nircmdc.exe setsysvolume 100000");
 			Runtime.getRuntime().exec("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe https://youtu.be/DuoCd7UEkpc?t=33");
 		}catch(IOException e) {
 			e.printStackTrace();

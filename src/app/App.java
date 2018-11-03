@@ -82,6 +82,10 @@ public class App {
 				if(cli.hasOption("numAttempts")) {
 					sockConfig.setAttemptTimes(Integer.parseInt(cli.getOptionValue("numAttempts")));
 				}
+				
+				if(cli.hasOption("ip")) {
+					sockConfig.setAddress(cli.getOptionValue("ip"));
+				}
 			}else {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("ChayasJoke", CmdHelper.startOptions());

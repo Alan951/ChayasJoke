@@ -5,7 +5,7 @@ import java.util.Map;
 import app.joke.Joke;
 import app.joke.JokeBase;
 
-public class RansomJoke implements Joke{
+public class RansomJoke extends JokeBase implements Joke{
 
 	@Override
 	public String getJokeName() {

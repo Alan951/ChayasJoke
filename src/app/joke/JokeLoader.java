@@ -27,8 +27,7 @@ import javafx.util.Pair;
 
 public class JokeLoader {
 
-	private static String jokeExternalPath = System.getProperty("user.dir") + File.separator + "jokes";
-	private static String jokeInternalPath;
+	private static String jokesPath = System.getProperty("user.dir") + File.separator + "jokes";
 	
 	public final static String FILE_NAME_JOKE_CONFIG = "config.json";
 	public final static String DEFAULT_CLASSNAME = "joke";
@@ -58,68 +57,20 @@ public class JokeLoader {
 	private void loadJokes() {
 		this.jokeList = new HashMap<String, Constructor<? extends JokeBase>>();
 		
-		try {
-			JokeLoader.jokeInternalPath = getClass().getResource("/jokes").toURI().toURL().getPath();
-			loadJokePropWrapper();
-			loadInernalJokes();
-			loadExternalJokes();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+		JokeLoader.jokesPath = "jokes/";
+		
+		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
+			System.out.println("[*] JokesPath = " + JokeLoader.jokesPath);
 		}
-	}
-	
-	public void setJokeExternalPath(String path) {
-		JokeLoader.jokeExternalPath = path;
-	}
-	
-	public String getJokeInternalPath() {
-		return JokeLoader.jokeExternalPath;
-	}
-	
-	public int loadInernalJokes() {
-		File file = new File(jokeInternalPath);
+		
+		loadJokePropWrapper();
 		int jokesLoaded = 0;
 		
-		if(!(file.exists() && file.isDirectory())) {
-			System.out.println("[!] Internal Joke Path doesn't exists. "+ file.getAbsolutePath());
-			return -1;
+		if(jokesPath == null) {
+			//return -1;
 		}
 		
-		for(File jokeFile : file.listFiles()) {
-			if(jokeFile.isFile()) {
-				Pair<String, Constructor<? extends JokeBase>> jokePair = loadJoke(jokeFile, "jokes."+jokeFile.getName().replaceFirst("[.][^.]+$", ""));
-				
-				if(jokePair == null) { //Error al intentar castear
-					continue;
-				}
-				
-				if(jokePair.getValue() == null) {
-					System.out.println("[!] Joke file \""+ jokeFile.getName() +"\".");
-					continue;
-				}
-				
-				System.out.println("[*] Joke Loaded: \""+ jokeFile.getName() +"\"");
-				this.jokeList.put(jokePair.getKey(), jokePair.getValue());	
-				
-				jokesLoaded++;
-			}
-		}
-		
-		System.out.println("[*] Internal Jokes loaded: "+jokesLoaded);
-		
-		return jokesLoaded;
-	}
-	
-	public int loadExternalJokes() {
-		int jokesLoaded = 0;
-		
-		if(jokeExternalPath == null) {
-			return -1;
-		}
-		
-		File dirJokes = new File(JokeLoader.jokeExternalPath);
+		File dirJokes = new File(JokeLoader.jokesPath);
 		
 		if(!dirJokes.exists()) {
 			System.out.println("[*] Joke External Path doesn't exists");
@@ -127,7 +78,6 @@ public class JokeLoader {
 				System.out.println("[*] Joke External Folder created");
 			}else {
 				System.out.println("[!] Can't create Joke External Folder");
-				return -1;
 			}
 		}
 		
@@ -138,9 +88,12 @@ public class JokeLoader {
 				}
 				
 				String className = jpw.getClassNameOfJoke(jokeFile.getName());
+				//String className = jokeFile.getName();
 				
-				if(className == null)
-					continue;
+				if(className == null) {
+					//continue;
+				}
+					
 				
 				Pair<String, Constructor<? extends JokeBase>> jokePair = loadJoke(jokeFile, className);
 				
@@ -157,13 +110,19 @@ public class JokeLoader {
 			}
 		}
 		
-		System.out.println("[*] External Jokes loaded: "+jokesLoaded);
-		
-		return jokesLoaded;
+		System.out.println("[*] Jokes: "+jokesLoaded);		
+	}
+	
+	public void setJokesPath(String path) {
+		JokeLoader.jokesPath = path;
+	}
+	
+	public String getJokesPath() {
+		return JokeLoader.jokesPath;
 	}
 	
 	public boolean loadJokePropWrapper() {
-		File file = new File(jokeExternalPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG);
+		File file = new File(jokesPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG);
 		if(!file.exists()) {
 			System.out.println("[*] Config jokes file doesn't exists");
 			
@@ -183,7 +142,7 @@ public class JokeLoader {
 			}
 		}
 		
-		try(Reader reader = new FileReader(JokeLoader.jokeExternalPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG)){
+		try(Reader reader = new FileReader(JokeLoader.jokesPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG)){
 			Gson gson = new GsonBuilder().create();
 			this.jpw = gson.fromJson(reader, JokePropsWrapper.class);
 		}catch(Exception e) {
@@ -198,15 +157,16 @@ public class JokeLoader {
 	private boolean createExampleConfigProperties() {
 		JokePropsWrapper jpw = new JokePropsWrapper();
 		
-		JokeProperties jp1 = new JokeProperties("JokeExample1", "app.joke");
-		JokeProperties jp2 = new JokeProperties("JokeExample2", "module.joke");
-		JokeProperties jp3 = new JokeProperties("JokeExample3", "main_package");
+		//Lista de jokes predeterminados
+		JokeProperties jp1 = new JokeProperties("CervezaJoke.class", "jokes.CervezaJoke");
+		JokeProperties jp2 = new JokeProperties("MouseJoke.class", "jokes.MouseJoke");
+		JokeProperties jp3 = new JokeProperties("RansomJoke.class", "jokes.RansomJoke");
 		
 		jpw.getJokeProperties().add(jp1);
 		jpw.getJokeProperties().add(jp2);
 		jpw.getJokeProperties().add(jp3);
 		
-		try (Writer writer = new FileWriter(JokeLoader.jokeExternalPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG)) {
+		try (Writer writer = new FileWriter(JokeLoader.jokesPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG)) {
 		    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		    gson.toJson(jpw, writer);
 		} catch (IOException e) {
@@ -216,7 +176,7 @@ public class JokeLoader {
 		}
 		
 		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL)
-			System.out.println("[*] Create file config created example at: " + JokeLoader.jokeExternalPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG);
+			System.out.println("[*] Create file config created example at: " + JokeLoader.jokesPath + File.separator + JokeLoader.FILE_NAME_JOKE_CONFIG);
 		
 		return true;
 	}
@@ -246,7 +206,7 @@ public class JokeLoader {
 			
 			return new Pair<String, Constructor<? extends JokeBase>>(constructor.newInstance().command(), constructor);
 		}catch(Exception e) {
-			System.out.println("[ERR] Error al intentar cargar " + file.getName() + ": " + e.getMessage());
+			System.out.println("[*] Error al intentar cargar " + file.getName() + ": " + e.getMessage());
 		}
 		
 		return null;

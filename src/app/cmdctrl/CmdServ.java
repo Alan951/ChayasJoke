@@ -56,6 +56,11 @@ public class CmdServ {
 		
 		try {
 			result = CmdHelper.parseCommand(command, CmdHelper.getOptions());
+			
+			if(result.cmdLine.getOptions().length == 0) {
+				result = null; 
+			}
+			
 		}catch(MissingArgumentException e) {
 			return new CheckCmdResult(command, "[!] Se esperaban argumentos para el comando", false); 
 		}

@@ -32,6 +32,10 @@ public class JokePropsWrapper {
 			return jP.get().getClassName();
 		}
 		
+		if(fileName.endsWith(".class")) {
+			return fileName.substring(0, fileName.lastIndexOf("."));
+		}
+		
 		return JokeLoader.DEFAULT_CLASSNAME;
 	}
 	

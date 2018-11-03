@@ -1,0 +1,16 @@
+{
+  "Jokes": [
+    {
+      "fileName": "CervezaJoke.class",
+      "className": "jokes.CervezaJoke"
+    },
+    {
+      "fileName": "MouseJoke.class",
+      "className": "jokes.MouseJoke"
+    },
+    {
+      "fileName": "RansomJoke.class",
+      "className": "jokes.RansomJoke"
+    }
+  ]
+}
