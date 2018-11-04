@@ -18,7 +18,7 @@ public class SockConfig {
 	public SockConfig(String address, int port) {
 		this.address = address;
 		this.port = port;
-		this.connMode = 0;
+		this.connMode = SERVER_MODE;
 	}
 	
 	public SockConfig(String address, int port, boolean attemptConnect, int attempt_times, boolean autoConnect) {
@@ -27,7 +27,7 @@ public class SockConfig {
 		this.attemptConnect = attemptConnect;
 		this.attempt_times = attempt_times;
 		this.autoConnect = autoConnect;
-		this.connMode = 1;
+		this.connMode = CLIENT_MODE;
 	}
 	
 	public String getAddress() {
@@ -76,6 +76,14 @@ public class SockConfig {
 
 	public void setAutoConnect(boolean autoConnect) {
 		this.autoConnect = autoConnect;
+	}
+
+	public int getConnMode() {
+		return connMode;
+	}
+
+	public void setConnMode(int connMode) {
+		this.connMode = connMode;
 	}
 
 	@Override

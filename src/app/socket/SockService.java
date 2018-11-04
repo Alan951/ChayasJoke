@@ -28,6 +28,7 @@ public class SockService {
 		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
 			System.out.println("[!] Attempting connect to "+this.conf.address+":"+this.conf.port);
 		}
+		
 		this.connect(this.conf);
 	}
 	

@@ -12,7 +12,7 @@ public class JokeFactory {
 		
 		if(jokeConstruct != null)
 			try {
-				JokeBase joke = jokeConstruct.newInstance();
+				JokeBase joke = jokeConstruct.newInstance();				
 				
 				return joke;
 			} catch (InstantiationException e) {

@@ -22,12 +22,12 @@ public class CmdClient {
 	}
 	
 	public void startInCommingMessages() {
-		System.out.println("startIncommingMessages invoked");
+		System.out.println("waiting commands...");
 		sockService.getMessageObserver().subscribe(inMessage -> {
 			String inStringMessage;
 			MessageSocket inMessageObject;
 			
-			System.out.println("[*] inCommingMessage "+inMessage);
+			System.out.println("[*] New command: " + inMessage);
 			
 			if(inMessage instanceof String) {
 				inStringMessage = (String)inMessage;
@@ -36,6 +36,7 @@ public class CmdClient {
 					runCommand(inStringMessage, null);
 				}else {
 					int r = jokeExecutor.executeJoke(inStringMessage);
+					
 					if(r == JokeExecutor.JOKE_NOT_FOUND)
 						this.sockService.sendDataPlz(new MessageSocket(MessageSocket.ACTION_JOKE_NOT_FOUND));
 					else if(r == JokeExecutor.JOKE_EXECUTED)
