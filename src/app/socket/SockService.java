@@ -97,17 +97,21 @@ public class SockService {
 		System.out.println("[*] onDisconnected invoked");
 		this.observerConnection.onNext(new ConnectionStatus(SockService.DISCONNECTED_STATUS, this));
 		
-		if(this.conf.isAutoConnect()) {
-			this.connect();
-		}else {
-			App.exit();
+		if(this.conf != null && this.conf.connMode == SockConfig.CLIENT_MODE) {
+			if(this.conf.isAutoConnect()) {
+				this.connect();
+			}else {
+				App.exit();
+			}
 		}
+		
 	}
 	
 	public boolean close() throws IOException{
 		this.observerMessages.onCompleted();
 		
 		try {
+		
 			this.ioSocket.stop();
 			this.socket.close();
 			
@@ -170,4 +174,11 @@ public class SockService {
 	public PublishSubject<ConnectionStatus> getConnectionObserver(){
 		return this.observerConnection;
 	}
+
+	@Override
+	public String toString() {
+		return "SockService [id=" + id + ", remoteIp=" + this.socket.getRemoteSocketAddress() + "]";
+	}
+	
+	
 }

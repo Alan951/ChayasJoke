@@ -44,7 +44,7 @@ public class CmdServ {
 			}
 		}
 		
-		sc.close();
+		//sc.close();
 	}
 	
 	public CheckCmdResult checkCommand(String command) {

@@ -27,7 +27,7 @@ public class ServerSockService {
 	}
 	
 	public boolean startInComingConnections() throws BindException{
-		System.out.println("[*] Server startInComingConnections over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
+		System.out.println("[*] Listening over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
 		
 		try {
 			this.flagInComConn = true;
@@ -54,13 +54,13 @@ public class ServerSockService {
 							.filter((evt) -> evt.status.equals(SockService.DISCONNECTED_STATUS))
 							.subscribe((evt) -> {
 								
-							System.out.println("[Disconnected]");
+							System.out.println("[!] SockClient disconected: " + evt.service);
 							this.clientSocks.remove(evt.service);
 						});
 					
 						this.clientSocks.add(sockService);
 						
-						System.out.println("[*] Server newConnectionAdded");
+						System.out.println("[*] New connection: " + sockService);
 						
 					} catch(IOException e) {
 						e.printStackTrace();
@@ -70,7 +70,9 @@ public class ServerSockService {
 		}catch(BindException e) {
 			throw e;
 		}catch(IOException e) {
-			e.printStackTrace();
+			System.out.println("[!] Server socket closed");
+			if(this.flagInComConn)
+				e.printStackTrace();
 			
 			return false;
 		}
@@ -82,11 +84,18 @@ public class ServerSockService {
 		this.clientSocks.forEach((client) -> {
 			try {
 				client.close();
-				flagInComConn = false;
 			}catch(IOException e) {
 				e.printStackTrace();
 			}
 		});
+		
+		try {
+			flagInComConn = false;
+			this.serverSock.close();
+		}catch(IOException e) {
+			System.out.println("[INFO] Server Socket closed");
+		}
+		
 	}
 	
 	public void close(long id) {

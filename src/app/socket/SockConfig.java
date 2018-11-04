@@ -1,11 +1,15 @@
 package app.socket;
 
 public class SockConfig {
+	public int connMode;
 	public String address;
 	public int port;
 	public boolean attemptConnect;
 	public int attempt_times;
 	public boolean autoConnect;
+	
+	public static final int SERVER_MODE = 0;
+	public static final int CLIENT_MODE = 1;
 
 	public SockConfig(int port) {
 		this.port = port;
@@ -14,6 +18,7 @@ public class SockConfig {
 	public SockConfig(String address, int port) {
 		this.address = address;
 		this.port = port;
+		this.connMode = 0;
 	}
 	
 	public SockConfig(String address, int port, boolean attemptConnect, int attempt_times, boolean autoConnect) {
@@ -22,6 +27,7 @@ public class SockConfig {
 		this.attemptConnect = attemptConnect;
 		this.attempt_times = attempt_times;
 		this.autoConnect = autoConnect;
+		this.connMode = 1;
 	}
 	
 	public String getAddress() {
