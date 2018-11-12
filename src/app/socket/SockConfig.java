@@ -5,27 +5,31 @@ public class SockConfig {
 	public String address;
 	public int port;
 	public boolean attemptConnect;
-	public int attempt_times;
+	public int attemptTimes;
 	public boolean autoConnect;
 	
 	public static final int SERVER_MODE = 0;
 	public static final int CLIENT_MODE = 1;
-
+	
+	public SockConfig() {}
+	
 	public SockConfig(int port) {
+		this.connMode = SERVER_MODE;
+		this.address = "localhost";
 		this.port = port;
 	}
 	
 	public SockConfig(String address, int port) {
 		this.address = address;
 		this.port = port;
-		this.connMode = SERVER_MODE;
+		this.connMode = CLIENT_MODE;
 	}
 	
 	public SockConfig(String address, int port, boolean attemptConnect, int attempt_times, boolean autoConnect) {
 		this.address = address;
 		this.port = port;
 		this.attemptConnect = attemptConnect;
-		this.attempt_times = attempt_times;
+		this.attemptTimes = attempt_times;
 		this.autoConnect = autoConnect;
 		this.connMode = CLIENT_MODE;
 	}
@@ -61,11 +65,11 @@ public class SockConfig {
 	}
 	
 	public int getAttemptTimes() {
-		return attempt_times;
+		return attemptTimes;
 	}
 	
-	public SockConfig setAttemptTimes(int attempt_times) {
-		this.attempt_times = attempt_times;
+	public SockConfig setAttemptTimes(int attemptTimes) {
+		this.attemptTimes = attemptTimes;
 		
 		return this;
 	}
@@ -89,7 +93,7 @@ public class SockConfig {
 	@Override
 	public String toString() {
 		return "Config [address=" + address + ", port=" + port + ", attemptConnect=" + attemptConnect
-				+ ", attempt_times=" + attempt_times + "]";
+				+ ", attempt_times=" + attemptTimes + "]";
 	}
 	
 }

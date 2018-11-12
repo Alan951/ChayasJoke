@@ -1,19 +1,22 @@
-package app.cmdctrl;
+package app.cmdctrl.controllers;
 
 import java.util.Scanner;
 
 import org.apache.commons.cli.MissingArgumentException;
 
 import app.GlobalOpts;
+import app.cmdctrl.BasicFunc;
+import app.cmdctrl.CheckCmdResult;
+import app.cmdctrl.CmdHelper;
 import app.config.Verbosity;
-import app.socket.ServerSockService;
+import app.socket.SockServerService;
 
 public class CmdServ {
 	
-	private ServerSockService serverService;
+	private SockServerService serverService;
 	private BasicFunc basicFunc;
 	
-	public CmdServ(ServerSockService serverService) {
+	public CmdServ(SockServerService serverService) {
 		this.serverService = serverService;
 		basicFunc = new BasicFunc(this.serverService);
 	}

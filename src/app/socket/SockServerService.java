@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ServerSockService {
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
+public class SockServerService {
 	private ServerSocket serverSock;
 	
 	private List<SockService> clientSocks;
@@ -17,9 +20,12 @@ public class ServerSockService {
 	
 	private SockConfig sockConfig;
 	
-	public ServerSockService(SockConfig sockConfig) {
+	private Logger logger = Logger.getLogger(SockServerService.class);
+	
+	public SockServerService(SockConfig sockConfig) {
 		clientSocks = new ArrayList<SockService>();
 		this.sockConfig = sockConfig;
+		
 	}
 	
 	public List<SockService> getClients() {
@@ -27,7 +33,7 @@ public class ServerSockService {
 	}
 	
 	public boolean startInComingConnections() throws BindException{
-		System.out.println("[*] Listening over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
+		logger.info("[*] Listening over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
 		
 		try {
 			this.flagInComConn = true;
@@ -47,20 +53,20 @@ public class ServerSockService {
 						sockService.setId(idAI);
 						
 						sockService.getMessageObserver().subscribe((msg) -> {
-							System.out.println("[*] NewMessage from ["+sockService.getId()+"]: "+msg);
+							this.logger.debug("NewMessage from " + sockService.toString() + ": " + msg);
 						});
 						
 						sockService.getConnectionObserver()
 							.filter((evt) -> evt.status.equals(SockService.DISCONNECTED_STATUS))
 							.subscribe((evt) -> {
-								
-							System.out.println("[!] SockClient disconected: " + evt.service);
+							
+							logger.debug("SockClient disconected: " + evt.service);
 							this.clientSocks.remove(evt.service);
 						});
 					
 						this.clientSocks.add(sockService);
 						
-						System.out.println("[*] New connection: " + sockService);
+						logger.debug("New connection: " + sockService);
 						
 					} catch(IOException e) {
 						e.printStackTrace();
@@ -70,9 +76,10 @@ public class ServerSockService {
 		}catch(BindException e) {
 			throw e;
 		}catch(IOException e) {
-			System.out.println("[!] Server socket closed");
+			logger.debug("Server socket closed");
+			
 			if(this.flagInComConn)
-				e.printStackTrace();
+				logger.error(e);
 			
 			return false;
 		}
@@ -87,15 +94,7 @@ public class ServerSockService {
 			}catch(IOException e) {
 				e.printStackTrace();
 			}
-		});
-		
-		try {
-			flagInComConn = false;
-			this.serverSock.close();
-		}catch(IOException e) {
-			System.out.println("[INFO] Server Socket closed");
-		}
-		
+		});		
 	}
 	
 	public void close(long id) {
@@ -107,6 +106,17 @@ public class ServerSockService {
 				e.printStackTrace();
 			}
 			
+		}
+	}
+	
+	public void stop() {
+		this.closeAll();
+		
+		try {
+			flagInComConn = false;
+			this.serverSock.close();
+		}catch(IOException e) {
+			logger.info("Server Socket closed");
 		}
 	}
 	
@@ -129,5 +139,9 @@ public class ServerSockService {
 		}else {
 			return false;
 		}
+	}
+	
+	public Logger getLogger() {
+		return this.logger;
 	}
 }

@@ -11,16 +11,16 @@ import app.config.Verbosity;
 import app.joke.JokeFactory;
 import app.joke.JokeLoader;
 import app.joke.MessageSocket;
-import app.socket.ServerSockService;
+import app.socket.SockServerService;
 
 public class BasicFunc {
 	
-	private ServerSockService serverService;
+	private SockServerService serverService;
 	
 	protected Integer result;
 	protected CommandLine cmd;
 	
-	public BasicFunc(ServerSockService serverService) {
+	public BasicFunc(SockServerService serverService) {
 		this.serverService = serverService;
 	}
 	
@@ -30,8 +30,6 @@ public class BasicFunc {
 	}
 
 	public BasicFunc routeCommand(String command) {
-		
-		
 		String mainCommand = cmd.getOptions()[0].getLongOpt();
 		
 		if(GlobalOpts.verboseLevel == Verbosity.VERBOSE_DEBUG) {

@@ -3,6 +3,8 @@ package app.socket;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.apache.log4j.Logger;
+
 import app.App;
 import app.GlobalOpts;
 import app.config.Verbosity;
@@ -12,6 +14,8 @@ public class SockService {
 	public static final String CONNECTED_STATUS = "CONNECTED";
 	public static final String DISCONNECTED_STATUS = "DISCONNECTED";
 	public static final String ATTEMPT_CONNECT_STATUS = "ATTEMPT_CONNECT";
+	
+	private Logger logger = Logger.getLogger(SockService.class);
 	
 	private Socket socket;
 	private IOSocket ioSocket;
@@ -24,11 +28,12 @@ public class SockService {
 	
 	public SockService() {}
 	
-	public void connect() throws IOException {
-		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
-			System.out.println("[!] Attempting connect to "+this.conf.address+":"+this.conf.port);
-		}
-		
+	public SockService(SockConfig sockConfig) throws IOException {
+		this.conf = sockConfig;
+		this.connect();
+	}
+	
+	public void connect() throws IOException {		
 		this.connect(this.conf);
 	}
 	
@@ -39,26 +44,24 @@ public class SockService {
 			try {
 				int attempts = 0;
 				
-				while((attempts <= conf.attempt_times - 1) || conf.attempt_times == -1) {
-					System.out.println("[*] ATTEMPTING CONNECT");
+				while((attempts <= conf.attemptTimes - 1) || conf.attemptTimes == -1) {
+					logger.info("Attempting connect to " +conf);
 					this.observerConnection.onNext(new ConnectionStatus("ATTEMPT_CONNECT_STATUS", this));
 					
 					if(this.connectSocket()) {
 						break;
 					}else {
 						//Incremento el intento si son finitos
-						if(conf.attempt_times != -1)
+						if(conf.attemptTimes != -1)
 							attempts++;
 						
-						if(conf.attempt_times == -1 || attempts <= conf.attempt_times - 1) {	
+						if(conf.attemptTimes == -1 || attempts <= conf.attemptTimes - 1) {	
 							Thread.sleep(1000 * 3);
-							
-							
+								
 						}else {
-							if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL) {
-								System.out.println("[!] Can't connect to server");
-								App.exit();
-							}
+							logger.warn("Can't connect to server");
+							
+							App.exit();
 							
 						}
 					}
@@ -76,6 +79,7 @@ public class SockService {
 			this.socket = new Socket(this.conf.getAddress(), this.conf.getPort());
 		}catch(IOException e) {
 			//e.printStackTrace();
+			logger.error("Error when attempt connect socket", e);
 			return false;
 		}
 		
@@ -87,15 +91,21 @@ public class SockService {
 	private void onConnected() throws IOException {
 		this.observerMessages = PublishSubject.create();
 		
+		this.observerMessages.subscribe((Object newMessage) -> {
+			this.logger.debug("NewMessage: " + newMessage);
+		});
+		
 		this.ioSocket = new IOSocket(this);
 		this.ioSocket.start();
 		
-		System.out.println("[*] onConnected invoked");
+		logger.info("onConnected invoked");
+		
 		this.observerConnection.onNext(new ConnectionStatus(SockService.CONNECTED_STATUS, this));
 	}
 	
 	private void onDisconnected() throws IOException {
-		System.out.println("[*] onDisconnected invoked");
+		logger.info("onDisconnected invoked");
+		
 		this.observerConnection.onNext(new ConnectionStatus(SockService.DISCONNECTED_STATUS, this));
 		
 		if(this.conf != null && this.conf.connMode == SockConfig.CLIENT_MODE) {
@@ -110,6 +120,8 @@ public class SockService {
 	
 	public boolean close() throws IOException{
 		this.observerMessages.onCompleted();
+		
+		logger.info("onClose invoked");
 		
 		try {
 		
@@ -174,6 +186,10 @@ public class SockService {
 	
 	public PublishSubject<ConnectionStatus> getConnectionObserver(){
 		return this.observerConnection;
+	}
+	
+	public Logger getLogger() {
+		return this.logger;
 	}
 
 	@Override

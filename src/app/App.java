@@ -9,19 +9,22 @@ import org.apache.commons.cli.MissingArgumentException;
 
 
 import app.cmdctrl.CheckCmdResult;
-import app.cmdctrl.CmdClient;
 import app.cmdctrl.CmdHelper;
-import app.cmdctrl.CmdServ;
+import app.cmdctrl.controllers.CmdClient;
+import app.cmdctrl.controllers.CmdRemoteClient;
+import app.cmdctrl.controllers.CmdServ;
 import app.config.DefaultConfigure;
 import app.config.Verbosity;
 import app.socket.SockConfig;
-import app.socket.ServerSockService;
+import app.socket.SockLogger;
+import app.socket.SockServerService;
 import app.socket.SockService;
 
 public class App {
 	
 	private CmdServ cmdAndControl;
 	private CmdClient cmdClientRecv;
+	private CmdRemoteClient cmdRClient;
 	private SockConfig sockConfig;
 	private int runMode;
 	
@@ -48,13 +51,15 @@ public class App {
 	 * 
 	 * */
 	public App initConfig(String[] args) {
+		SockLogger.autoConfigure();
+		
 		try {
 			CheckCmdResult ccr = CmdHelper.parseCommand(args, CmdHelper.startOptions());
 			
 			CommandLine cli = ccr.cmdLine;
 			
 			if(cli.hasOption("server")) {
-				this.runMode = 2;
+				this.runMode = SockConfig.SERVER_MODE;
 				this.sockConfig = DefaultConfigure.getAutoSockConfigServer();
 				
 				if(cli.hasOption("port")) {
@@ -62,7 +67,7 @@ public class App {
 				}
 				
 			}else if(cli.hasOption("client")) {
-				this.runMode = 1;
+				this.runMode = SockConfig.CLIENT_MODE;
 				this.sockConfig = DefaultConfigure.getautoSockConfigClient();
 				
 				if(cli.hasOption("port")) {
@@ -75,7 +80,7 @@ public class App {
 				
 				if(cli.hasOption("autoConn")) {
 					sockConfig.setAutoConnect(true);
-				}else {
+				} else {
 					sockConfig.setAutoConnect(false);
 				}
 				
@@ -86,7 +91,26 @@ public class App {
 				if(cli.hasOption("ip")) {
 					sockConfig.setAddress(cli.getOptionValue("ip"));
 				}
-			}else {
+			}else if(cli.hasOption("remote-server")){
+				this.runMode = 3;
+				this.sockConfig = new SockConfig();
+				this.sockConfig.setAttemptTimes(-1);
+				
+				if(cli.hasOption("ip")) {
+					this.sockConfig.setAddress(cli.getOptionValue("ip"));
+				}else {
+					throw new MissingArgumentException("IP Address of remote server missing");
+				}
+				
+				if(cli.hasOption("port")) {
+					this.sockConfig.setPort(Integer.parseInt(cli.getOptionValue("port")));
+				}else {
+					throw new MissingArgumentException("Port address of remote server missing");
+				}
+				
+				sockConfig.setConnMode(this.runMode);
+				
+			} else {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("ChayasJoke", CmdHelper.startOptions());
 				System.exit(0);
@@ -107,10 +131,12 @@ public class App {
 	}
 	
 	public void run() throws IOException {
-		if(this.runMode == 1) {
+		if(this.runMode == SockConfig.CLIENT_MODE) {
 			runClientMode(this.sockConfig);
-		}else if(this.runMode == 2) {
+		}else if(this.runMode == SockConfig.SERVER_MODE) {
 			runServerMode(this.sockConfig);
+		}else if(this.runMode == 3) {
+			runRemoteServerMode(this.sockConfig);
 		}
 	}
 	
@@ -136,12 +162,29 @@ public class App {
 	public void runServerMode(SockConfig config) throws BindException{
 		System.out.println("[*] Server mode running");
 		
-		ServerSockService server = new ServerSockService(config);
+		SockServerService server = new SockServerService(config);
 		
 		server.startInComingConnections();
 		cmdAndControl = new CmdServ(server);
 		cmdAndControl.openCmd();
+	}
+	
+	public void runRemoteServerMode(SockConfig config) throws IOException {
+		System.out.println("[*] Remote Server mode running");
 		
+		 
+		SockService socket = new SockService();
+		
+		socket.getConnectionObserver()
+			.filter((conn) -> conn.status.equals(SockService.CONNECTED_STATUS))
+			.subscribe((conn) -> {
+				
+			});
+		
+		socket.setConfig(config);
+		socket.connect();
+		cmdRClient = new CmdRemoteClient(socket);
+		cmdRClient.openCmd();
 	}
 	
 	public static void exit() {

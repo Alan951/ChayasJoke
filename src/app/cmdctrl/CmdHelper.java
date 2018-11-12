@@ -32,7 +32,11 @@ public class CmdHelper {
 		Option hostServerMode = new Option("c", "client", false, "Victim Mode");
 		Option help = new Option("h", "help", false, "This message");
 		
+		Option remoteServerMode = new Option("rs", "remote-server", false, "Connect to server");
+		Option passwordRemoteServ = new Option("pass", "password", false, "Password for connect to remote server");
 		
+		options.addOption(remoteServerMode);
+		options.addOption(passwordRemoteServ);
 		options.addOption(hostClientMode);
 		options.addOption(ipAddrToConnect);
 		options.addOption(port);

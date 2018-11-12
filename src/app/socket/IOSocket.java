@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.apache.log4j.Logger;
+
 import app.GlobalOpts;
 import app.config.Verbosity;
 
@@ -16,6 +18,8 @@ public class IOSocket {
 	private Thread oisThread;
 	
 	private boolean flagOis;
+	
+	private static Logger logger = Logger.getLogger(IOSocket.class);
 	
 	public IOSocket() {}
 	
@@ -46,22 +50,23 @@ public class IOSocket {
 		this.oisThread = new Thread(() -> {
 			this.flagOis = true;
 			
-			if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
-				System.out.println("[*] initOIS invoked - thread started");
+			logger.info("OIS thread started");
 			
 			Object inMessage = "";
 			
 			while(this.flagOis) { //While thread is up
 				try {
-					if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL)
-						System.out.println("[*] IOSocket waiting for messages");
+					logger.info("waiting for messaged");
+					
 					while((inMessage = this.ois.readObject() ) != null) {						
 						service.inComingData(inMessage);
 					}
 				}catch(ClassNotFoundException e) {
+					logger.error("Error al parsear el mensaje de entrada", e);
 					e.printStackTrace();
+					
 				}catch(IOException e) {
-					//e.printStackTrace();
+					//e.printStackTrace();				
 					
 					this.flagOis = false;
 					
@@ -81,12 +86,14 @@ public class IOSocket {
 	}
 	
 	public void sendData(Object data) throws IOException {
-		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
-			System.out.println("[*] IOSocket sendData invoked: "+ data);
+		logger.debug("sendData invoked: " + data);
+	
 		this.oos.writeObject(data);
 	}
 	
 	public void stop() throws IOException {
+		logger.debug("socket stopped invoked");
+		
 		this.flagOis = false;
 		this.oisThread.interrupt();
 		
