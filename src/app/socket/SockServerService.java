@@ -11,10 +11,14 @@ import java.util.Optional;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import rx.subjects.PublishSubject;
+
 public class SockServerService {
 	private ServerSocket serverSock;
 	
 	private List<SockService> clientSocks;
+	
+	private PublishSubject<MessageWrapper> observerClientMessages;
 	
 	private boolean flagInComConn;
 	
@@ -33,11 +37,12 @@ public class SockServerService {
 	}
 	
 	public boolean startInComingConnections() throws BindException{
-		logger.info("[*] Listening over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
-		
 		try {
 			this.flagInComConn = true;
 			serverSock = new ServerSocket(this.sockConfig.getPort());
+			logger.info("[*] Listening over "+this.sockConfig.getAddress()+":"+this.sockConfig.getPort());
+			
+			this.observerClientMessages = PublishSubject.create();
 			
 			new Thread(() -> {
 				long idAI = 0;
@@ -54,6 +59,7 @@ public class SockServerService {
 						
 						sockService.getMessageObserver().subscribe((msg) -> {
 							this.logger.debug("NewMessage from " + sockService.toString() + ": " + msg);
+							this.observerClientMessages.onNext(msg);
 						});
 						
 						sockService.getConnectionObserver()
@@ -143,5 +149,9 @@ public class SockServerService {
 	
 	public Logger getLogger() {
 		return this.logger;
+	}
+	
+	public PublishSubject<MessageWrapper> getClientMessagesObserver(){
+		return this.observerClientMessages;
 	}
 }

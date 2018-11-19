@@ -13,6 +13,8 @@ public class MessageSocket implements Serializable {
 	public static final String ACTION_JOKE_NOT_FOUND 	= "JOKE_NOT_FOUND";
 	public static final String ACTION_JOKE_EXECUTED 	= "JOKE_EXECUTED";
 	public static final String ACTION_COMMAND_EXECUTED	= "CMD_EXECUTED";
+	public static final String ACTION_REQ_SET_REMOTE_SERV	= "REQ_RS";
+	public static final String ACTION_RES_SET_REMOTE_SERV	= "RES_RS";
 
 	private int code;
 	private String action;

@@ -15,6 +15,7 @@ import app.cmdctrl.controllers.CmdRemoteClient;
 import app.cmdctrl.controllers.CmdServ;
 import app.config.DefaultConfigure;
 import app.config.Verbosity;
+import app.joke.MessageSocket;
 import app.socket.SockConfig;
 import app.socket.SockLogger;
 import app.socket.SockServerService;
@@ -28,7 +29,7 @@ public class App {
 	private SockConfig sockConfig;
 	private int runMode;
 	
-	public static void main(String [] args) throws IOException{
+	public static void main(String [] args) throws IOException, Exception{
 		/*if(args.length < 1) {
 			System.out.println("[*] Error, faltan parametros de ejecución.\n\t-s Server mode\n\t-c Client mode");
 			return;
@@ -50,7 +51,7 @@ public class App {
 	 * TODO: validate input data.
 	 * 
 	 * */
-	public App initConfig(String[] args) {
+	public App initConfig(String[] args) throws Exception {
 		SockLogger.autoConfigure();
 		
 		try {
@@ -117,7 +118,8 @@ public class App {
 			}
 			
 		}catch(MissingArgumentException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			throw e;
 		}
 		
 		return this;
@@ -171,18 +173,10 @@ public class App {
 	
 	public void runRemoteServerMode(SockConfig config) throws IOException {
 		System.out.println("[*] Remote Server mode running");
-		
 		 
 		SockService socket = new SockService();
 		
-		socket.getConnectionObserver()
-			.filter((conn) -> conn.status.equals(SockService.CONNECTED_STATUS))
-			.subscribe((conn) -> {
-				
-			});
-		
 		socket.setConfig(config);
-		socket.connect();
 		cmdRClient = new CmdRemoteClient(socket);
 		cmdRClient.openCmd();
 	}

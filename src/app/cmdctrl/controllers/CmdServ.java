@@ -9,7 +9,10 @@ import app.cmdctrl.BasicFunc;
 import app.cmdctrl.CheckCmdResult;
 import app.cmdctrl.CmdHelper;
 import app.config.Verbosity;
+import app.joke.MessageSocket;
+import app.socket.MessageWrapper;
 import app.socket.SockServerService;
+import rx.subjects.PublishSubject;
 
 public class CmdServ {
 	
@@ -24,6 +27,9 @@ public class CmdServ {
 	public void openCmd() {
 		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL)
 			System.out.println("[*] Command Control started");
+		
+		this.serverService.getClientMessagesObserver().subscribe((newMessageObject) -> handleMessage(newMessageObject) );
+		
 		Scanner sc = new Scanner(System.in);
 		
 		while(true) {
@@ -48,6 +54,19 @@ public class CmdServ {
 		}
 		
 		//sc.close();
+	}
+	
+	public void handleMessage(MessageWrapper messageObj) {
+		System.out.println("handleMessage: " + messageObj.toString());
+		
+		if(messageObj.getPayload() instanceof String) {
+			
+		}else if(messageObj.getPayload() instanceof MessageSocket) {
+			MessageSocket message = (MessageSocket) messageObj.getPayload();
+			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV)) {
+				System.out.println("Desea ser remote-server el cliente: " + messageObj.getSource());
+			}
+		}
 	}
 	
 	public CheckCmdResult checkCommand(String command) {

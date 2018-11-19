@@ -4,6 +4,7 @@ import app.cmdctrl.Commands;
 import app.joke.JokeExecutor;
 import app.joke.MessageSocket;
 import app.socket.SockService;
+import rx.subjects.PublishSubject;
 
 public class CmdClient {
 
@@ -30,8 +31,8 @@ public class CmdClient {
 			
 			System.out.println("[*] New command: " + inMessage);
 			
-			if(inMessage instanceof String) {
-				inStringMessage = (String)inMessage;
+			if(inMessage.getPayload() instanceof String) {
+				inStringMessage = (String)inMessage.getPayload();
 				
 				if(Commands.exists(inStringMessage)) {
 					runCommand(inStringMessage, null);
@@ -44,8 +45,8 @@ public class CmdClient {
 						this.sockService.sendDataPlz(new MessageSocket(MessageSocket.ACTION_JOKE_EXECUTED));
 				}
 				
-			}else if(inMessage instanceof MessageSocket) {
-				inMessageObject = (MessageSocket)inMessage;
+			}else if(inMessage.getPayload() instanceof MessageSocket) {
+				inMessageObject = (MessageSocket)inMessage.getPayload();
 				
 				if(inMessageObject.getAction().equals(MessageSocket.ACTION_EXECUTE_COMMAND)) {
 					runCommand(inMessageObject.getCommand(), inMessageObject.getParam());

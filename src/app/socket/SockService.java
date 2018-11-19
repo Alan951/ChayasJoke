@@ -23,9 +23,9 @@ public class SockService {
 	
 	private long id;
 	
-	private PublishSubject<Object> observerMessages;
-	private PublishSubject<ConnectionStatus> observerConnection = PublishSubject.create();
 	
+	private PublishSubject<ConnectionStatus> observerConnection = PublishSubject.create();
+	private PublishSubject<MessageWrapper> observerMessages;
 	public SockService() {}
 	
 	public SockService(SockConfig sockConfig) throws IOException {
@@ -156,12 +156,12 @@ public class SockService {
 		return this.socket;
 	}
 	
-	public PublishSubject<Object> getMessageObserver(){
+	public PublishSubject<MessageWrapper> getMessageObserver(){
 		return this.observerMessages;
 	}
 	
-	public void inComingData(Object message) {
-		this.observerMessages.onNext(message);
+	public void inComingData(Object message) {		
+		this.observerMessages.onNext(new MessageWrapper(message, this));
 	}
 	
 	public void sendData(Object data) throws IOException {

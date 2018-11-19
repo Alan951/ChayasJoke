@@ -3,14 +3,19 @@ package app.cmdctrl.controllers;
 import java.io.IOException;
 import java.util.Scanner;
 
+import app.joke.MessageSocket;
 import app.socket.SockService;
 
 public class CmdRemoteClient {
 
 	private SockService sockService;
 	
-	public CmdRemoteClient(SockService sockService){
+	public CmdRemoteClient(SockService sockService) throws IOException{
 		this.sockService = sockService;
+		
+		init();
+		
+		this.sockService.connect();
 	}
 	
 	public void openCmd() {
@@ -35,15 +40,12 @@ public class CmdRemoteClient {
 		}
 	}
 	
-	public void initialize() {
+	public void init() {
 		this.sockService.getConnectionObserver()
 			.filter((conn) -> conn.status.equals(SockService.CONNECTED_STATUS))
 			.subscribe((conn) -> {
-			this.sockService.getMessageObserver().subscribe((message) -> {
-				System.out.println("[SERVER]: " + message.toString());
-			});
+			
+			this.sockService.sendDataPlz(new MessageSocket(MessageSocket.ACTION_REQ_SET_REMOTE_SERV));
 		});
-		
 	}
-	
 }
