@@ -164,6 +164,8 @@ public class SockService {
 		if(message instanceof MessageWrapper) {
 			MessageWrapper messageWrap = (MessageWrapper)message;
 			
+			messageWrap.setSource(this);
+			
 			this.observerMessages.onNext(messageWrap);
 		}else {
 			this.observerMessages.onNext(new MessageWrapper(message, this));
