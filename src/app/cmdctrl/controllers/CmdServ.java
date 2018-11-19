@@ -12,11 +12,13 @@ import app.config.Verbosity;
 import app.joke.MessageSocket;
 import app.socket.MessageWrapper;
 import app.socket.SockServerService;
+import app.socket.SockService;
 import rx.subjects.PublishSubject;
 
 public class CmdServ {
 	
 	private SockServerService serverService;
+	private SockService remoteServerService;
 	private BasicFunc basicFunc;
 	
 	public CmdServ(SockServerService serverService) {
@@ -61,10 +63,15 @@ public class CmdServ {
 		
 		if(messageObj.getPayload() instanceof String) {
 			
+			
+			
 		}else if(messageObj.getPayload() instanceof MessageSocket) {
 			MessageSocket message = (MessageSocket) messageObj.getPayload();
+			
 			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV)) {
-				System.out.println("Desea ser remote-server el cliente: " + messageObj.getSource());
+				System.out.println("Remote server setted: " + messageObj.getSource());
+				this.remoteServerService = messageObj.getSource();
+				return;
 			}
 		}
 	}

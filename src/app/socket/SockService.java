@@ -160,8 +160,14 @@ public class SockService {
 		return this.observerMessages;
 	}
 	
-	public void inComingData(Object message) {		
-		this.observerMessages.onNext(new MessageWrapper(message, this));
+	public void inComingData(Object message) {
+		if(message instanceof MessageWrapper) {
+			MessageWrapper messageWrap = (MessageWrapper)message;
+			
+			this.observerMessages.onNext(messageWrap);
+		}else {
+			this.observerMessages.onNext(new MessageWrapper(message, this));
+		}
 	}
 	
 	public void sendData(Object data) throws IOException {
