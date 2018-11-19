@@ -1,10 +1,14 @@
 package app.socket;
 
-public class MessageWrapper {
+import java.io.Serializable;
 
+public class MessageWrapper implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
 	private Object payload;
-	private SockService source;
-	private SockService destination;
+	private transient SockService source;
+	private transient SockService destination;
 	
 	public MessageWrapper(Object payload, SockService source, SockService destination) {
 		this.payload = payload;
@@ -15,7 +19,6 @@ public class MessageWrapper {
 	public MessageWrapper(Object payload, SockService source) {
 		this.payload = payload;
 		this.source = source;
-		this.destination = destination;
 	}
 
 	public Object getPayload() {

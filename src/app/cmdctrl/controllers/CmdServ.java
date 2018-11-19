@@ -43,29 +43,45 @@ public class CmdServ {
 				break;
 			}
 			
-			CheckCmdResult cmd = checkCommand(command);
-			
-			if(cmd.isValid) {
-				basicFunc.routeCommand(command, cmd.cmdLine).then((result) -> {
-					System.out.println("[:] ResultCode: " + result.resultCode);
-					if(result.result != null)
-						System.out.println(result.result);
-					
-					
-				});
-			}else {
-				System.out.println("[!] Error\n"+cmd.result);
-			}
+			onEnterCommand(command);
 		}
 		
 		//sc.close();
 	}
 	
+	public void onEnterCommand(String command) {
+		CheckCmdResult cmd = checkCommand(command);
+		
+		if(cmd.isValid) {
+			basicFunc.routeCommand(command, cmd.cmdLine).then((result) -> {
+				System.out.println("[:] ResultCode: " + result.resultCode);
+				if(result.result != null)
+					System.out.println(result.result);
+				
+				if(this.remoteServerService != null) {
+					this.remoteServerService.sendDataPlz(result);
+				}
+			});
+		}else {
+			System.out.println("[!] Error\n"+cmd.result);
+			
+			if(this.remoteServerService != null) {
+				this.remoteServerService.sendDataPlz("[!] Error\n"+cmd.result);
+			}
+		}
+	}
+	
+	
 	public void handleMessage(MessageWrapper messageObj) {
 		System.out.println("handleMessage: " + messageObj.toString());
 		
+		if(this.remoteServerService != null && this.remoteServerService != messageObj.getSource()) {
+			this.remoteServerService.sendDataPlz(messageObj);
+		}
+		
 		if(messageObj.getPayload() instanceof String) {
-			
+			if(this.remoteServerService != null && this.remoteServerService == messageObj.getSource())
+				onEnterCommand((String)messageObj.getPayload());
 			
 			
 		}else if(messageObj.getPayload() instanceof MessageSocket) {
@@ -81,7 +97,7 @@ public class CmdServ {
 	
 	public CheckCmdResult checkCommand(String command) {
 		if(command.trim().isEmpty()) {
-			return new CheckCmdResult(command, "[!] Comando no valido", false);
+			return new CheckCmdResult(command, "[!] No se encontro comando", false);
 		}
 		
 		CheckCmdResult result;
@@ -89,7 +105,7 @@ public class CmdServ {
 		try {
 			result = CmdHelper.parseCommand(command, CmdHelper.getOptions());
 			
-			if(result.cmdLine.getOptions().length == 0) {
+			if(result != null && result.cmdLine.getOptions().length == 0) {
 				result = null; 
 			}
 			
@@ -98,7 +114,7 @@ public class CmdServ {
 		}
 		
 		if(result == null) {
-			return new CheckCmdResult(command, "[!] Comando no valido", false);
+			return new CheckCmdResult(command, "[!] Comando "+command+" no valido", false);
 		}
 		
 		return result;

@@ -3,6 +3,7 @@ package app.cmdctrl.controllers;
 import java.io.IOException;
 import java.util.Scanner;
 
+import app.cmdctrl.RouteCmdResult;
 import app.joke.MessageSocket;
 import app.socket.SockService;
 
@@ -44,8 +45,19 @@ public class CmdRemoteClient {
 		this.sockService.getConnectionObserver()
 			.filter((conn) -> conn.status.equals(SockService.CONNECTED_STATUS))
 			.subscribe((conn) -> {
+				
+			this.sockService.getMessageObserver().subscribe((message) -> {
+				if(message.getPayload() instanceof RouteCmdResult) {
+					RouteCmdResult result = (RouteCmdResult)message.getPayload();
+					
+					System.out.println("[SERVER]: " + result.resultCode);
+					System.out.println("[SERVER]: " + result.result);
+				}
+			});
 			
 			this.sockService.sendDataPlz(new MessageSocket(MessageSocket.ACTION_REQ_SET_REMOTE_SERV));
 		});
+		
+		
 	}
 }

@@ -1,6 +1,8 @@
 package app.cmdctrl;
 
-public class RouteCmdResult {
+import java.io.Serializable;
+
+public class RouteCmdResult implements Serializable {
 
 	public Integer resultCode;
 	public String result;
