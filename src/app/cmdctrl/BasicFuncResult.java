@@ -2,6 +2,6 @@ package app.cmdctrl;
 
 public interface BasicFuncResult {
 
-	public void run(Integer result);
+	public void run(RouteCmdResult result);
 	
 }

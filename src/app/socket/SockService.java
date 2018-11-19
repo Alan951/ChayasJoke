@@ -23,9 +23,9 @@ public class SockService {
 	
 	private long id;
 	
-	
 	private PublishSubject<ConnectionStatus> observerConnection = PublishSubject.create();
 	private PublishSubject<MessageWrapper> observerMessages;
+	
 	public SockService() {}
 	
 	public SockService(SockConfig sockConfig) throws IOException {

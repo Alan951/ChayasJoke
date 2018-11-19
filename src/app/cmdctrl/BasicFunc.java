@@ -1,5 +1,8 @@
 package app.cmdctrl;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,12 +15,13 @@ import app.joke.JokeFactory;
 import app.joke.JokeLoader;
 import app.joke.MessageSocket;
 import app.socket.SockServerService;
+import app.socket.SockService;
 
 public class BasicFunc {
 	
 	private SockServerService serverService;
 	
-	protected Integer result;
+	protected RouteCmdResult result;
 	protected CommandLine cmd;
 	
 	public BasicFunc(SockServerService serverService) {
@@ -57,24 +61,23 @@ public class BasicFunc {
 		return this;
 	}
 	
-	public int executeJoke(CommandLine cmd) {
+	public RouteCmdResult executeJoke(CommandLine cmd) {
 		//verifica que joke exista
 		if(!JokeFactory.exists(cmd.getOptionValue("joke"))){
-			if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_NORMAL)
-				System.out.println("[!] Joke seleccionado no existe");
-			return -1;
+			return new RouteCmdResult(-1, "[!] Joke seleccionado no exisste");
 		}
 		
 		MessageSocket message = new MessageSocket(MessageSocket.ACTION_EXECUTE_JOKE);
 		String joke = cmd.getOptionValue("joke");
 		message.setJokeName(joke);
 		Map<String, String> jokeParams;
+		String result = "";
 		boolean abortExec = false;
 		
 		//Verifica si tiene parametros
 		if(CmdHelper.existsOption("params", cmd.getOptions())) {
 			if(cmd.getOptionValues("params").length % 2 != 0) {
-				System.out.println("[!] Lista de parametros erronea");
+				result = "[!] Lista de parametros erronea";
 				abortExec = true;
 			}else {
 				jokeParams = new HashMap<String, String>();
@@ -93,40 +96,44 @@ public class BasicFunc {
 			long id = Long.parseLong(cmd.getOptionValue("id"));
 			
 			serverService.sendData(message, id);
-			return 1;
+			return new RouteCmdResult(1);
 		}else {
 			if(joke != null && !abortExec) {
 				this.serverService.sendAll(message);
 				//sendCommand = true;
-				return 1;
+				return new RouteCmdResult(1);
 			}
 		}
 		
-		return 0;
+		return new RouteCmdResult(0, result);
 	}
 
-	public int showHelp() {
+	public RouteCmdResult showHelp() {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("ChayasJoke", CmdHelper.getOptions());
 		
-		return 1;
-	}
-	
-	public int showJokeList() {
-		System.out.println(JokeLoader.getInstance().getJokeListNames());
-		return 1;
-	}
-	
-	public int showClientList() {
-		System.out.println("ID\tIP");
-		this.serverService.getClients().forEach((sockService) -> {
-			System.out.println("["+ sockService.getId() +"]\t"+sockService.getSocket().getInetAddress().getHostAddress());
-		});
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
 		
-		return 1;
+		formatter.printHelp(pw, HelpFormatter.DEFAULT_WIDTH, "ChayasJoke", null, CmdHelper.getOptions(), HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD, null, false);
+		
+		return new RouteCmdResult(1, sw.toString());
 	}
 	
-	public int sendEcho(CommandLine cmd) {
+	public RouteCmdResult showJokeList() {
+		return new RouteCmdResult(1, JokeLoader.getInstance().getJokeListNames().toString());
+	}
+	
+	public RouteCmdResult showClientList() {
+		String result = "ID\tIP\n";
+		
+		for(SockService serv : this.serverService.getClients()) {
+			result += "["+ serv.getId() +"]\t"+serv.getSocket().getInetAddress().getHostAddress() + "\n";
+		}
+		
+		return new RouteCmdResult(1, result);
+	}
+	
+	public RouteCmdResult sendEcho(CommandLine cmd) {
 		String echoMessage = cmd.getOptionValue("echo");
 		System.out.println("Echo sended: "+echoMessage);
 		
@@ -148,13 +155,13 @@ public class BasicFunc {
 			}						
 		}
 		
-		return 1;
+		return new RouteCmdResult(1);
 	}
 	
 	public BasicFunc then(BasicFuncResult callback) {
 		callback.run(result);
 		
-		this.result = 0;
+		this.result = new RouteCmdResult(0);
 		
 		return this;
 	}

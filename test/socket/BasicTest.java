@@ -44,7 +44,7 @@ class BasicTest {
 		Thread.sleep(1000);
 		
 		sockService.getMessageObserver().subscribe((Object message) -> {
-
+			
 		});
 		
 		Thread.sleep(1000);

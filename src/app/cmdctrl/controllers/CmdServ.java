@@ -47,8 +47,11 @@ public class CmdServ {
 			
 			if(cmd.isValid) {
 				basicFunc.routeCommand(command, cmd.cmdLine).then((result) -> {
-					if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG)
-						System.out.println("[*] Result of command routed: "+result);
+					System.out.println("[:] ResultCode: " + result.resultCode);
+					if(result.result != null)
+						System.out.println(result.result);
+					
+					
 				});
 			}else {
 				System.out.println("[!] Error\n"+cmd.result);
