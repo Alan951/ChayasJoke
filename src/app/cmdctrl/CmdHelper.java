@@ -103,7 +103,13 @@ public class CmdHelper {
 			for(int x = 0 ; x < cmds.length ; x++) {
 				if(!tempCmd.equals("") || cmds[x].startsWith("\"")) {
 					if(cmds[x].startsWith("\"")) {
-						tempCmd += cmds[x].replaceAll("\"", "");
+						if(cmds[x].endsWith("\"")) { //arg "without_spaces"
+							cmds2.add(cmds[x].replaceAll("\"", ""));
+							tempCmd = "";
+						}else {
+							tempCmd += cmds[x].replaceAll("\"", "");
+						}
+						
 					}else if(cmds[x].endsWith("\"")) {
 						tempCmd += " "+cmds[x].replaceAll("\"", "");
 						cmds2.add(tempCmd);
