@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import app.cmdctrl.RouteCmdResult;
 import app.joke.MessageSocket;
-import app.socket.SockService;
+import com.jalan.cksock.SockService;
 
 public class CmdRemoteClient {
 

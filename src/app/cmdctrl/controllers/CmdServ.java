@@ -10,9 +10,9 @@ import app.cmdctrl.CheckCmdResult;
 import app.cmdctrl.CmdHelper;
 import app.config.Verbosity;
 import app.joke.MessageSocket;
-import app.socket.MessageWrapper;
-import app.socket.SockServerService;
-import app.socket.SockService;
+import com.jalan.cksock.MessageWrapper;
+import com.jalan.cksock.SockServerService;
+import com.jalan.cksock.SockService;
 import rx.subjects.PublishSubject;
 
 public class CmdServ {

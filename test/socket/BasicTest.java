@@ -9,11 +9,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.junit.jupiter.api.Test;
 
-import app.socket.SockConfig;
-import app.socket.SockLogger;
-import app.socket.SockLoggerConfig;
-import app.socket.SockServerService;
-import app.socket.SockService;
+import com.jalan.cksock.SockConfig;
+import com.jalan.cksock.SockLogger;
+import com.jalan.cksock.SockLoggerConfig;
+import com.jalan.cksock.SockServerService;
+import com.jalan.cksock.SockService;
 
 class BasicTest {
 
@@ -30,7 +30,7 @@ class BasicTest {
 		SockLoggerConfig.setCustomPattern(sockServer.getLogger(),  " [SERVER] " + PatternLayout.TTCC_CONVERSION_PATTERN);
 		
 		try {
-			sockServer.startInComingConnections();
+			sockServer.listen();
 		} catch (BindException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

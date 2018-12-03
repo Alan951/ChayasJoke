@@ -2,7 +2,7 @@ package app.joke;
 
 import java.util.Map;
 
-import app.socket.SockService;
+import com.jalan.cksock.SockService;
 
 public class JokeBase implements Joke{
 	

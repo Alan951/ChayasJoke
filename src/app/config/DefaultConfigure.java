@@ -1,6 +1,6 @@
 package app.config;
 
-import app.socket.SockConfig;
+import com.jalan.cksock.SockConfig;
 
 public class DefaultConfigure {
 

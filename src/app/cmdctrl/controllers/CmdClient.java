@@ -3,7 +3,7 @@ package app.cmdctrl.controllers;
 import app.cmdctrl.Commands;
 import app.joke.JokeExecutor;
 import app.joke.MessageSocket;
-import app.socket.SockService;
+import com.jalan.cksock.SockService;
 import rx.subjects.PublishSubject;
 
 public class CmdClient {

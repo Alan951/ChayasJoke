@@ -1,6 +1,5 @@
 package app.cmdctrl;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -14,8 +13,8 @@ import app.config.Verbosity;
 import app.joke.JokeFactory;
 import app.joke.JokeLoader;
 import app.joke.MessageSocket;
-import app.socket.SockServerService;
-import app.socket.SockService;
+import com.jalan.cksock.SockServerService;
+import com.jalan.cksock.SockService;
 
 public class BasicFunc {
 	

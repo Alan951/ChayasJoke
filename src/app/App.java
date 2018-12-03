@@ -16,10 +16,10 @@ import app.cmdctrl.controllers.CmdServ;
 import app.config.DefaultConfigure;
 import app.config.Verbosity;
 import app.joke.MessageSocket;
-import app.socket.SockConfig;
-import app.socket.SockLogger;
-import app.socket.SockServerService;
-import app.socket.SockService;
+import com.jalan.cksock.SockConfig;
+import com.jalan.cksock.SockLogger;
+import com.jalan.cksock.SockServerService;
+import com.jalan.cksock.SockService;
 
 public class App {
 	
@@ -166,7 +166,7 @@ public class App {
 		
 		SockServerService server = new SockServerService(config);
 		
-		server.startInComingConnections();
+		server.listen();
 		cmdAndControl = new CmdServ(server);
 		cmdAndControl.openCmd();
 	}
