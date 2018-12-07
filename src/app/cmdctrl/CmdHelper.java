@@ -55,6 +55,10 @@ public class CmdHelper {
 		Option addUser = new Option("a", "add-user", false, "Add new user credential to validate authentication");
 		addUser.setRequired(false);
 		options.addOption(addUser);
+		
+		Option enableAuth = new Option("ea", "enable-auth", true, "Enable authentication for remote server");
+		enableAuth.setType(Boolean.class);
+		options.addOption(enableAuth);
 	
 		Option chooseJoke = new Option("j", "joke", true, "Joke name");
 		chooseJoke.setRequired(false);

@@ -13,6 +13,7 @@ import org.apache.commons.cli.HelpFormatter;
 
 import app.GlobalOpts;
 import app.ScannerService;
+import app.cmdctrl.controllers.CmdRemoteClient;
 import app.cmdctrl.controllers.config.CmdConfigLoader;
 import app.cmdctrl.controllers.config.CmdCredential;
 import app.cmdctrl.controllers.config.CmdServConfig;
@@ -63,6 +64,9 @@ public class BasicFunc {
 				break;
 			case "help":
 				this.result = showHelp();
+				break;
+			case "enable-auth":
+				this.result = mngAuth(cmd);
 				break;
 			case "add-user":
 				this.result = addUser();
@@ -164,6 +168,18 @@ public class BasicFunc {
 					.sendAll(new MessageSocket(MessageSocket.ACTION_EXECUTE_COMMAND, Commands.ECHO.name(), echoMessage));
 				//sendCommand = true;
 			}						
+		}
+		
+		return new RouteCmdResult(1);
+	}
+	
+	public RouteCmdResult mngAuth(CommandLine cmd) {		
+		Boolean enable = Boolean.parseBoolean(cmd.getOptionValue("enable-auth"));
+		try {
+			CmdConfigLoader.getInstance().loadCmdServConfig().getCmdServConfig().setRequiredAuthRemoteClient(enable);
+			CmdConfigLoader.getInstance().saveCmdServConfig(null);
+		}catch(IOException e) {
+			e.printStackTrace();
 		}
 		
 		return new RouteCmdResult(1);
