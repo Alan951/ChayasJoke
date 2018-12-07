@@ -1,14 +1,21 @@
 package app.cmdctrl;
 
+import java.io.Console;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 
 import app.GlobalOpts;
+import app.ScannerService;
+import app.cmdctrl.controllers.config.CmdConfigLoader;
+import app.cmdctrl.controllers.config.CmdCredential;
+import app.cmdctrl.controllers.config.CmdServConfig;
 import app.config.Verbosity;
 import app.joke.JokeFactory;
 import app.joke.JokeLoader;
@@ -22,6 +29,8 @@ public class BasicFunc {
 	
 	protected RouteCmdResult result;
 	protected CommandLine cmd;
+	
+	public BasicFunc() {}
 	
 	public BasicFunc(SockServerService serverService) {
 		this.serverService = serverService;
@@ -54,6 +63,9 @@ public class BasicFunc {
 				break;
 			case "help":
 				this.result = showHelp();
+				break;
+			case "add-user":
+				this.result = addUser();
 				break;
 		}
 		
@@ -153,6 +165,47 @@ public class BasicFunc {
 				//sendCommand = true;
 			}						
 		}
+		
+		return new RouteCmdResult(1);
+	}
+	
+	/*
+	 * TODO: validate input data
+	 * */
+	public RouteCmdResult addUser() {
+		Scanner sc = ScannerService.getInstance().getScanner();
+		
+		System.out.println("Ingresar usuario");
+		
+		String usuario = sc.nextLine();
+		char password[];
+		String pass;
+		
+		if(System.console() != null) {
+			Console console = System.console();
+			password = console.readPassword("Ingresar password: ");
+			pass = new String(password);
+		}else {
+			System.out.println("Ingresar password");
+			pass = sc.nextLine();
+		}
+		
+		CmdCredential cred = new CmdCredential(usuario, pass);
+				
+		System.out.println("Add user credential: " + cred);
+		
+		try {
+			CmdConfigLoader
+				.getInstance()
+				.loadAndGetCmdServConfig()
+				.getUsers().add(cred);
+			
+			CmdConfigLoader.getInstance().saveCmdServConfig(null);
+			
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+		
 		
 		return new RouteCmdResult(1);
 	}

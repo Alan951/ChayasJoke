@@ -1,13 +1,17 @@
 package app.cmdctrl.controllers;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import org.apache.commons.cli.MissingArgumentException;
 
 import app.GlobalOpts;
+import app.ScannerService;
 import app.cmdctrl.BasicFunc;
 import app.cmdctrl.CheckCmdResult;
 import app.cmdctrl.CmdHelper;
+import app.cmdctrl.controllers.config.CmdConfigLoader;
+import app.cmdctrl.controllers.config.CmdServConfig;
 import app.config.Verbosity;
 import app.joke.MessageSocket;
 import com.jalan.cksock.MessageWrapper;
@@ -24,6 +28,12 @@ public class CmdServ {
 	public CmdServ(SockServerService serverService) {
 		this.serverService = serverService;
 		basicFunc = new BasicFunc(this.serverService);
+		
+		try {
+			CmdConfigLoader.getInstance().loadCmdServConfig();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}	
 	}
 	
 	public void openCmd() {
@@ -32,10 +42,10 @@ public class CmdServ {
 		
 		this.serverService.getClientMessagesObserver().subscribe((newMessageObject) -> handleMessage(newMessageObject) );
 		
-		Scanner sc = new Scanner(System.in);
+		Scanner sc = ScannerService.getInstance().getScanner();
 		
 		while(true) {
-			String command = sc.nextLine();
+			String command = sc.nextLine();	
 			
 			if(command.equals("exit") || command.equals("salir")){
 				System.out.println("Bye...");
@@ -46,7 +56,7 @@ public class CmdServ {
 			onEnterCommand(command);
 		}
 		
-		//sc.close();
+		sc.close();
 	}
 	
 	public void onEnterCommand(String command) {
@@ -87,10 +97,40 @@ public class CmdServ {
 		}else if(messageObj.getPayload() instanceof MessageSocket) {
 			MessageSocket message = (MessageSocket) messageObj.getPayload();
 			
-			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV)) {
-				System.out.println("Remote server setted: " + messageObj.getSource());
-				this.remoteServerService = messageObj.getSource();
-				return;
+			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV) || message.getAction().equals(MessageSocket.ACTION_SET_CRED_REMOTE_SERV)) {
+				if(CmdConfigLoader.getInstance().getCmdServConfig().isRequiredAuthRemoteClient()) {
+					if(message.getAction().equals(MessageSocket.ACTION_SET_CRED_REMOTE_SERV)) {
+						String usuario = message.getJokeParams().get("usuario");
+						String password = message.getJokeParams().get("password");
+						
+						if(CmdConfigLoader
+								.getInstance()
+								.getCmdServConfig()
+								.getUsers().stream()
+								.filter((cred) -> 
+									cred.getUsername()
+									.equals(usuario) && cred.getPassword()
+									.equals(password))
+									.findFirst()
+									.isPresent()) {
+							this.remoteServerService = messageObj.getSource();
+						}
+					}else {
+						messageObj.getSource().sendDataPlz(new MessageSocket(MessageSocket.ACTION_REQ_CRED));
+
+						try {
+							Thread.sleep(500);
+							messageObj.getSource().close();
+						}catch(InterruptedException e) {
+							e.printStackTrace();
+						}catch(IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}else {
+					this.remoteServerService = messageObj.getSource();
+					return;
+				}				
 			}
 		}
 	}

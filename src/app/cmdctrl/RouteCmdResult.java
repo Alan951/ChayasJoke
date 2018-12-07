@@ -6,6 +6,7 @@ public class RouteCmdResult implements Serializable {
 
 	public Integer resultCode;
 	public String result;
+	public Object obj;
 	
 	public RouteCmdResult(Integer resultCode) {
 		this.resultCode = resultCode;

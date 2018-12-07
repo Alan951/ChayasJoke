@@ -52,6 +52,10 @@ public class CmdHelper {
 	public static Options getOptions() {		
 		Options options = new Options();
 		
+		Option addUser = new Option("a", "add-user", false, "Add new user credential to validate authentication");
+		addUser.setRequired(false);
+		options.addOption(addUser);
+	
 		Option chooseJoke = new Option("j", "joke", true, "Joke name");
 		chooseJoke.setRequired(false);
 		options.addOption(chooseJoke);
@@ -72,6 +76,7 @@ public class CmdHelper {
 		options.addOption(new Option("cl", "client-list", false, "List clients"));
 		
 		options.addOption(new Option("h", "help", false, "This message"));
+		
 		
 		Option echoOpt = new Option("e", "echo", true, "Echo test");
 		echoOpt.setArgs(1);

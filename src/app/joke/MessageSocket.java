@@ -15,6 +15,8 @@ public class MessageSocket implements Serializable {
 	public static final String ACTION_COMMAND_EXECUTED	= "CMD_EXECUTED";
 	public static final String ACTION_REQ_SET_REMOTE_SERV	= "REQ_RS";
 	public static final String ACTION_RES_SET_REMOTE_SERV	= "RES_RS";
+	public static final String ACTION_SET_CRED_REMOTE_SERV	= "SET_REQ_CRED";
+	public static final String ACTION_REQ_CRED				= "REQ_CRED";
 
 	private int code;
 	private String action;
