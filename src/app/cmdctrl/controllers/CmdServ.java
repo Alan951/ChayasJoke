@@ -11,6 +11,7 @@ import app.cmdctrl.BasicFunc;
 import app.cmdctrl.CheckCmdResult;
 import app.cmdctrl.CmdHelper;
 import app.cmdctrl.controllers.config.CmdConfigLoader;
+import app.cmdctrl.controllers.config.CmdCredential;
 import app.cmdctrl.controllers.config.CmdServConfig;
 import app.config.Verbosity;
 import app.joke.MessageSocket;
@@ -23,6 +24,7 @@ public class CmdServ {
 	
 	private SockServerService serverService;
 	private SockService remoteServerService;
+	private CmdCredential credentials;
 	private BasicFunc basicFunc;
 	
 	public CmdServ(SockServerService serverService) {
@@ -82,6 +84,12 @@ public class CmdServ {
 	}
 	
 	
+	public void setClientRemote(SockService service) {
+		this.remoteServerService = service;
+		this.remoteServerService.sendDataPlz(new MessageSocket(MessageSocket.ACTION_REMOTE_WELCOME));
+		this.remoteServerService.getConnectionObserver().filter((connEvt) -> connEvt.status == SockService.DISCONNECTED_STATUS).subscribe((onDisconnected) -> this.remoteServerService = null);
+	}
+	
 	public void handleMessage(MessageWrapper messageObj) {
 		System.out.println("handleMessage: " + messageObj.toString());
 		
@@ -97,11 +105,11 @@ public class CmdServ {
 		}else if(messageObj.getPayload() instanceof MessageSocket) {
 			MessageSocket message = (MessageSocket) messageObj.getPayload();
 			
-			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV) || message.getAction().equals(MessageSocket.ACTION_SET_CRED_REMOTE_SERV)) {
+			if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV) || message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV_W_CRED)) {
 				if(CmdConfigLoader.getInstance().getCmdServConfig().isRequiredAuthRemoteClient()) {
-					if(message.getAction().equals(MessageSocket.ACTION_SET_CRED_REMOTE_SERV)) {
-						String usuario = message.getJokeParams().get("usuario");
-						String password = message.getJokeParams().get("password");
+					if(message.getAction().equals(MessageSocket.ACTION_REQ_SET_REMOTE_SERV_W_CRED)) {
+						String usuario = message.getJokeParams().get("user");
+						String password = message.getJokeParams().get("pass");
 						
 						if(CmdConfigLoader
 								.getInstance()
@@ -113,10 +121,21 @@ public class CmdServ {
 									.equals(password))
 									.findFirst()
 									.isPresent()) {
-							this.remoteServerService = messageObj.getSource();
+							
+							setClientRemote(messageObj.getSource());
+						}else {
+							messageObj.getSource().sendDataPlz(new MessageSocket(MessageSocket.ACTION_REMOTE_AUTH_FAIL));
+							
+							try {
+								Thread.sleep(500);
+								messageObj.getSource().close();
+							}catch(Exception e) {
+								e.printStackTrace();
+							}
+							
 						}
 					}else {
-						messageObj.getSource().sendDataPlz(new MessageSocket(MessageSocket.ACTION_REQ_CRED));
+						messageObj.getSource().sendDataPlz(new MessageSocket(MessageSocket.ACTION_NEED_AUTH));
 
 						try {
 							Thread.sleep(500);
@@ -128,7 +147,7 @@ public class CmdServ {
 						}
 					}
 				}else {
-					this.remoteServerService = messageObj.getSource();
+					setClientRemote(messageObj.getSource());
 					return;
 				}				
 			}

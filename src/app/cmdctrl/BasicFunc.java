@@ -174,15 +174,16 @@ public class BasicFunc {
 	}
 	
 	public RouteCmdResult mngAuth(CommandLine cmd) {		
-		Boolean enable = Boolean.parseBoolean(cmd.getOptionValue("enable-auth"));
+		Boolean isEnable = Boolean.parseBoolean(cmd.getOptionValue("enable-auth"));
 		try {
-			CmdConfigLoader.getInstance().loadCmdServConfig().getCmdServConfig().setRequiredAuthRemoteClient(enable);
+			CmdConfigLoader.getInstance().loadCmdServConfig().getCmdServConfig().setRequiredAuthRemoteClient(isEnable);
 			CmdConfigLoader.getInstance().saveCmdServConfig(null);
+			return new RouteCmdResult(1, "Se ha cambiado la autenticación a " + isEnable);
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
 		
-		return new RouteCmdResult(1);
+		return new RouteCmdResult(0, "Error al intentar cambiar la configuración de autenticación a: " + isEnable);
 	}
 	
 	/*

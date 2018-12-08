@@ -32,6 +32,8 @@ public class CmdHelper {
 		Option hostServerMode = new Option("c", "client", false, "Victim Mode");
 		Option help = new Option("h", "help", false, "This message");
 		
+		Option setUser = new Option("u", "user", true, "Set user credential authentication to connect with remote server");
+		
 		Option remoteServerMode = new Option("rs", "remote-server", false, "Connect to server");
 		Option passwordRemoteServ = new Option("pass", "password", false, "Password for connect to remote server");
 		
@@ -45,6 +47,7 @@ public class CmdHelper {
 		options.addOption(autoConnect);
 		options.addOption(hostServerMode);
 		options.addOption(help);
+		options.addOption(setUser);
 		
 		return options;
 	}

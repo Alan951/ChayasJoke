@@ -20,5 +20,10 @@ public class RouteCmdResult implements Serializable {
 		this.result = result;
 		this.resultCode = resultCode;
 	}
+
+	@Override
+	public String toString() {
+		return "RouteCmdResult [resultCode=" + resultCode + ", result=" + result + ", obj=" + obj + "]";
+	}
 	
 }

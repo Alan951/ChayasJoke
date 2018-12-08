@@ -14,9 +14,12 @@ public class MessageSocket implements Serializable {
 	public static final String ACTION_JOKE_EXECUTED 	= "JOKE_EXECUTED";
 	public static final String ACTION_COMMAND_EXECUTED	= "CMD_EXECUTED";
 	public static final String ACTION_REQ_SET_REMOTE_SERV	= "REQ_RS";
+	public static final String ACTION_REQ_SET_REMOTE_SERV_W_CRED	= "REQ_RS_CRED";
 	public static final String ACTION_RES_SET_REMOTE_SERV	= "RES_RS";
-	public static final String ACTION_SET_CRED_REMOTE_SERV	= "SET_REQ_CRED";
-	public static final String ACTION_REQ_CRED				= "REQ_CRED";
+	public static final String ACTION_NEED_AUTH			= "NEED_AUTH";
+	public static final String ACTION_REMOTE_WELCOME	= "REMOTE_WELCOME";
+	public static final String ACTION_REMOTE_AUTH_FAIL	= "FAIL_AUTH";
+	
 
 	private int code;
 	private String action;

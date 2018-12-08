@@ -1,5 +1,6 @@
 package app;
 
+import java.io.Console;
 import java.io.IOException;
 import java.net.BindException;
 
@@ -13,6 +14,7 @@ import app.cmdctrl.CmdHelper;
 import app.cmdctrl.controllers.CmdClient;
 import app.cmdctrl.controllers.CmdRemoteClient;
 import app.cmdctrl.controllers.CmdServ;
+import app.cmdctrl.controllers.config.CmdCredential;
 import app.config.DefaultConfigure;
 import app.config.Verbosity;
 import app.joke.MessageSocket;
@@ -27,15 +29,10 @@ public class App {
 	private CmdClient cmdClientRecv;
 	private CmdRemoteClient cmdRClient;
 	private SockConfig sockConfig;
+	private CmdCredential credentials;
 	private int runMode;
 	
 	public static void main(String [] args) throws IOException, Exception{
-		/*if(args.length < 1) {
-			System.out.println("[*] Error, faltan parametros de ejecución.\n\t-s Server mode\n\t-c Client mode");
-			return;
-		}*/
-		
-		//String mode = args[0];
 		try {
 			new App()
 				.bootstrap()
@@ -109,6 +106,21 @@ public class App {
 					throw new MissingArgumentException("Port address of remote server missing");
 				}
 				
+				if(cli.hasOption("user")) {
+					Console console = System.console();
+					String password;
+					
+					if(console == null) {
+						System.out.println("Enter the password:");
+						password = ScannerService.getInstance().getScanner().nextLine();
+					}else {
+						password = new String(console.readPassword("Enter the password: "));
+					}
+					
+					CmdCredential cred = new CmdCredential(cli.getOptionValue("user"), password);
+					this.credentials = cred;
+				}
+				
 				sockConfig.setConnMode(this.runMode);
 				
 			} else {
@@ -177,7 +189,8 @@ public class App {
 		SockService socket = new SockService();
 		
 		socket.setConfig(config);
-		cmdRClient = new CmdRemoteClient(socket);
+		
+		cmdRClient = this.credentials == null ? new CmdRemoteClient(socket) : new CmdRemoteClient(socket, this.credentials);
 		cmdRClient.openCmd();
 	}
 	
