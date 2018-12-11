@@ -35,7 +35,8 @@ public class CmdConfigLoader {
 			try(Reader reader = new FileReader(this.cmdServConfigPath)){
 				Gson gson = new GsonBuilder().create();
 				this.cmdServConfig = gson.fromJson(reader, CmdServConfig.class);
-				System.out.println("Archivo CmdServConf cargado ["+this.cmdServConfigPath+"]");
+				System.out.println("[*] File cmd config loaded");
+				System.out.println("[*] Authentication requires: " + cmdServConfig.isRequiredAuthRemoteClient());
 			}
 		}else {
 			this.cmdServConfig = new CmdServConfig();

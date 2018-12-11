@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -201,12 +199,13 @@ public class JokeLoader {
 			ClassLoader loader = URLClassLoader.newInstance(
 					new URL[] { file.toURI().toURL() }, getClass().getClassLoader());
 			
-			Class jokeClass = loader.loadClass(className);
+			Class<? extends JokeBase> jokeClass = (Class<? extends JokeBase>)loader.loadClass(className);
 			Constructor<? extends JokeBase> constructor = jokeClass.getConstructor();
 			
 			return new Pair<String, Constructor<? extends JokeBase>>(constructor.newInstance().command(), constructor);
 		}catch(Exception e) {
 			System.out.println("[*] Error al intentar cargar " + file.getName() + ": " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return null;
