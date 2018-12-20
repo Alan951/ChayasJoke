@@ -45,11 +45,58 @@ public class JokeLoader {
 	}
 	
 	private JokeLoader() {
-		loadJokes();
+		loadJokesWithJson();
 	}
 	
 	protected void reLoadJokes() {
-		loadJokes();
+		loadJokesWithJson();
+	}
+	
+	private boolean validJokeFile(String fileName) {
+		return fileName.endsWith(".class") || fileName.endsWith(".jar");
+	}
+	
+	private void loadJokesWithJson() {
+		this.jokeList = new HashMap<String, Constructor<? extends JokeBase>>();
+		
+		JokeLoader.jokesPath = "jokes/";
+		
+		loadJokePropWrapper();
+		
+		int jokesLoaded = 0;
+		
+		for(JokeProperties jokeProp: jpw.getJokeProperties()) {
+			String jokeFileName = jokeProp.getFileName();
+			
+			jokeFileName = JokeLoader.jokesPath + jokeFileName;
+			
+			System.out.print("[!] Loading \""+ jokeProp.getClassName() +"\"");
+			
+			if(!new File(jokeFileName).exists()) {
+				System.out.println("... Error. The file not exists!");
+				
+				continue;
+			}
+			
+			File jokeFile = new File(jokeFileName);
+			
+			String className = jokeProp.getClassName();
+			
+			Pair<String, Constructor<? extends JokeBase>> jokePair = loadJoke(jokeFile, className);
+			
+			if(jokePair.getValue() == null) {
+				System.out.println("[!] Joke file \""+ jokeFileName +"\" error");
+				continue;
+			}
+				
+			//System.out.println("[*] Joke Loaded: \""+ jokeFileName +"\"");
+			//this.jokeList.add(joke);
+			this.jokeList.put(jokePair.getKey(), jokePair.getValue());
+			
+			jokesLoaded++;
+			
+			System.out.println("... OK!");
+		}
 	}
 	
 	private void loadJokes() {
@@ -58,7 +105,7 @@ public class JokeLoader {
 		JokeLoader.jokesPath = "jokes/";
 		
 		if(GlobalOpts.verboseLevel >= Verbosity.VERBOSE_DEBUG) {
-			System.out.println("[*] JokesPath = " + JokeLoader.jokesPath);
+			System.out.println("[*] JokesPath = " + new File(JokeLoader.jokesPath).getAbsolutePath());
 		}
 		
 		loadJokePropWrapper();
@@ -81,7 +128,7 @@ public class JokeLoader {
 		
 		for(File jokeFile : dirJokes.listFiles()) {
 			if(jokeFile.isFile()) {
-				if(jokeFile.getName().equals(JokeLoader.FILE_NAME_JOKE_CONFIG)) {
+				if(jokeFile.getName().equals(JokeLoader.FILE_NAME_JOKE_CONFIG) || !validJokeFile(jokeFile.getName())) {
 					continue;
 				}
 				

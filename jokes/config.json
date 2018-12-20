@@ -13,12 +13,12 @@
 			"className": "jokes.MouseJoke"
 		},
 		{
-			"fileName": "RansomJoke.class",
-			"className": "jokes.RansomJoke"
-		},
-		{
 			"fileName": "DieJoke.class",
 			"className": "jokes.DieJoke"
+		},
+		{
+			"fileName": "./RansomJoke/Wana_Decrypt0r_2.0.jar",
+			"className": "src.RansomJoke"
 		}
 	]
 }
